@@ -1,0 +1,450 @@
+
+    Tabla de contenidos
+
+  * 1 Contexto <#contexto>
+  * 2 Los datos <#los-datos>
+  * 3 Parte 1. Preguntas y preinscripción (10 puntos) <#parte-1.-
+    preguntas-y-preinscripción-10-puntos>
+  * 4 Parte 2. Tipos de variables y depuración (20 puntos) <#parte-2.-
+    tipos-de-variables-y-depuración-20-puntos>
+  * 5 Parte 3. Análisis exploratorio y visualización (25 puntos)
+    <#parte-3.-análisis-exploratorio-y-visualización-25-puntos>
+  * 6 Parte 4. Inferencia (25 puntos) <#parte-4.-inferencia-25-puntos>
+  * 7 Parte 5. Potencia y tamaño de la muestra (15 puntos) <#parte-5.-
+    potencia-y-tamaño-de-la-muestra-15-puntos>
+  * 8 Parte 6. Marco legal de los datos (5 puntos) <#parte-6.-marco-
+    legal-de-los-datos-5-puntos>
+  * 9 Pauta de evaluación <#pauta-de-evaluación>
+
+
+  Tarea 1
+
+Evaluación de un programa público: tipos de datos, visualización e
+inferencia
+
+Autor/a
+
+INF396, Introducción a la Ciencia de Datos
+
+*Modalidad.* Individual; rigen las políticas de colaboración y de
+entregas tardías del programa del curso. *Plazo.* Dos semanas desde la
+publicación; fecha de entrega por confirmar, por plataforma por
+confirmar. *Entregables.* Dos archivos, |tarea1_apellido_nombre.ipynb| y |tarea1_apellido_nombre.pdf|. El cuaderno debe ejecutarse de principio a fin sin intervención,
+leyendo el CSV desde la URL indicada más abajo, y con una semilla fija
+declarada en la primera celda para todo lo que use aleatoriedad
+(bootstrap, permutaciones, simulaciones). El informe tiene a lo más doce
+páginas, incluye las figuras y responde cada pregunta en el orden del
+enunciado. Se evalúa el informe; el cuaderno respalda los números. *Uso
+de IA.* Permitido, declarando al inicio del informe qué partes del
+código o del texto se generaron con ayuda de estas herramientas.
+
+
+  1 Contexto
+
+El Programa Semillas, del Servicio Nacional de Apoyo a la Crianza,
+entrega cuatro materiales educativos a las familias en controles de
+salud sucesivos del sistema público: el /Cuaderno de Espera/ en el
+primer control de gestación, la /Caja de los Primeros Meses/ en el
+control del recién nacido, el /Maletín Explorador/ en el control de los
+doce meses y /Cuentos para Conversar/ en el control de los tres años. El
+propósito del programa es sensibilizar e informar sobre estimulación
+temprana, lectura compartida y crianza respetuosa. El programa, el
+servicio y los datos de esta tarea son ficticios; la situación no lo es.
+La Ley 20.530 encarga al Ministerio de Desarrollo Social y Familia la
+evaluación de los programas sociales, y la Dirección de Presupuestos
+evalúa programas públicos con cargo al artículo 52 del Decreto Ley
+1.263. Un estudio de este tipo se licita, se ejecuta y termina en un
+informe cuyas conclusiones deciden si el programa continúa, se rediseña
+o se termina.
+
+El servicio contrató una encuesta presencial a 2.400 cuidadores de niños
+y niñas de hasta cinco años que recibieron al menos un material durante
+2025, y usted forma parte del equipo que analiza los datos. Las bases
+del estudio fijaban tres requisitos: representatividad nacional y por
+macrozona (Norte, Centro, Región Metropolitana y Sur), un error muestral
+nacional de a lo más 3,5 % por material y una lectura comparada entre
+macrozonas. Las preguntas de evaluación son las siguientes.
+
+  * *Cobertura y uso.* ¿Qué fracción de las familias recibe cada
+    material y qué fracción lo usa con frecuencia? ¿Difiere entre
+    macrozonas?
+  * *Pertinencia y valoración.* ¿Cómo valoran los cuidadores cada
+    material y lo consideran pertinente para la edad de su hijo o hija?
+  * *Resultados.* ¿Se asocia el uso de los materiales con mayores
+    conocimientos sobre crianza y con más prácticas de lectura en el hogar?
+  * *Diseño.* ¿Fue el estudio capaz de responder estas preguntas con la
+    precisión requerida, y qué muestra necesitaría un seguimiento?
+
+La tarea no pide conclusiones causales. Toda afirmación sobre la
+relación entre uso y conocimientos se formula como asociación, y en la
+parte 4 se pide explicitar por qué.
+
+
+  2 Los datos
+
+El archivo |semillas_2026.csv| <https://aavelozb.github.io/data/semillas_2026.csv> contiene una fila
+por cuidador encuestado. La muestra se diseñó con asignación fija de 600
+cuidadores por macrozona, estratificada por tramo de edad del niño o
+niña según la tabla siguiente, y se levantó por conglomerados en centros
+de salud, con alrededor de 20 cuidadores por centro. Cada material lo
+evalúan sólo los cuidadores cuyo hijo o hija ya alcanzó el control en
+que se entrega; para los tramos anteriores las columnas del material
+quedan vacías por diseño.
+
+Tramo 	Por macrozona 	Total 	Materiales que evalúa
+Gestante 	120 	480 	Cuaderno de Espera
+0-11 meses 	120 	480 	El anterior y Caja de los Primeros Meses
+12-35 meses 	150 	600 	Los anteriores y Maletín Explorador
+36-59 meses 	210 	840 	Los anteriores y Cuentos para Conversar
+*Total* 	*600* 	*2.400* 	
+
+De este diseño se sigue que el Cuaderno lo evalúan 2.400 cuidadores, la
+Caja 1.920, el Maletín 1.440 y los Cuentos 840. El archivo tiene más de
+2.400 filas porque contiene duplicados; tras depurarlo debe quedar
+exactamente el diseño. No se entregan ponderadores: trate la muestra
+como autoponderada dentro de cada macrozona y, cuando calcule una
+estimación nacional, promedie las cuatro macrozonas con peso igual,
+señalando en una línea qué cambiaría si tuvieran pesos poblacionales
+distintos.
+
+*Convención para todas las partes.* La /cobertura/ de un material es la
+proporción de cuidadores elegibles (en el tramo de entrega o
+posteriores) con |recibio_<material>| igual a Sí. El /uso frecuente/ de un material es la proporción con |uso_<material>| igual a Frecuente *entre quienes lo recibieron*. Las partes 3 a 5 se
+calculan sobre el conjunto depurado de la parte 2.
+
+Columna 	Descripción
+|id_cuidador| 	Identificador del cuidador
+|id_centro| 	Centro de salud donde se contactó al cuidador (conglomerado)
+|macrozona| 	Norte, Centro, RM, Sur
+|region| 	Región de residencia
+|rural| 	Urbano o Rural
+|tramo| 	Tramo del niño o niña: Gestante, 0-11 meses, 12-35 meses, 36-59 meses
+|edad_meses| 	Edad del niño o niña en meses (vacío para gestantes)
+|semanas_gestacion| 	Semanas de gestación (sólo gestantes)
+|peso_nacimiento| 	Peso al nacer, en gramos
+|sexo_cuidador|, |edad_cuidador| 	Sexo y edad del cuidador que responde
+|escolaridad| 	Básica, Media, Técnica, Universitaria
+|migrante|, |pueblo_originario| 	Sí o No, declarados por el cuidador
+|n_hijos| 	Número de hijos
+|recibio_<material>| 	Sí o No; vacío si el tramo es anterior a la entrega
+|uso_<material>| 	Nunca, Ocasional, Frecuente; vacío si no lo recibió
+|valoracion_<material>| 	Escala de 1 (muy mala) a 5 (muy buena); vacío si no lo recibió
+|pertinente_<material>| 	Sí o No, ¿es adecuado para la edad de su hijo o hija?; vacío si no lo
+recibió
+|indice_conocimientos| 	Índice de conocimientos sobre crianza, de 0 a 100
+|lectura_semana| 	Días de la semana en que se lee o cuenta un cuento al niño o niña (0
+a 7)
+|fecha_entrega| 	Fecha de entrega del último material recibido
+|fecha_encuesta| 	Fecha de la entrevista
+
+Los sufijos de material son |cuaderno|, |caja|, |maletin| y |cuentos|. El archivo se entrega tal como salió del sistema de captura, sin depurar.
+
+| <#cb1-1>import pandas as pd
+ <#cb1-2>d = pd.read_csv("https://aavelozb.github.io/data/semillas_2026.csv")
+ <#cb1-3>d.shape
+
+|
+
+//
+
+
+  3 Parte 1. Preguntas y preinscripción (10 puntos)
+
+Antes de abrir el archivo, y sólo con la información de las secciones
+anteriores, escriba un *plan de análisis* de una página que contenga lo
+siguiente.
+
+ 1. Tres hipótesis contrastables, una por cada una de las tres primeras
+    preguntas de evaluación, cada una con su
+    H0
+
+    , su
+    H1
+
+    , el estadístico que usará, el nivel
+    α
+
+    y el *efecto mínimo relevante* en unidades del problema (puntos
+    porcentuales, puntos del índice). Justifique en una o dos líneas por
+    qué ese efecto es el que cambiaría una decisión del servicio.
+ 2. El criterio de control del error que aplicará a la familia de
+    comparaciones entre macrozonas de la parte 4c (error global con
+    Bonferroni o Holm, o tasa de falsos descubrimientos con Benjamini y
+    Hochberg), con su justificación en términos del costo de un falso
+    positivo para el servicio.
+ 3. Las reglas de exclusión y de corrección de registros que aplicará,
+    fijadas antes de ver los datos, indicando para cada tipo de problema
+    (duplicado, valor fuera de dominio, inconsistencia) si el registro
+    se excluye, se corrige o el valor se marca como faltante.
+
+Este plan se entrega como primera sección del informe y no se modifica
+después. Si al analizar los datos decide apartarse de él, deje el plan
+original y explique el cambio en la sección correspondiente. El apunte
+IV de inferencia explica por qué este orden importa.
+
+
+  4 Parte 2. Tipos de variables y depuración (20 puntos)
+
+ 1. Clasifique cada columna según su escala de medida (nominal, ordinal,
+    de intervalo o razón, fecha) y según su estructura (numérica,
+    categórica, cíclica, identificador, conglomerado). Indique para cada
+    una qué operaciones tienen sentido (por ejemplo, promediar |valoracion_cuaderno| requiere un supuesto; promediar |uso_cuaderno| no tiene sentido sin codificarla).
+ 2. Distinga, para las columnas de materiales, entre el vacío
+    estructural (el cuidador no está en el tramo) y el dato faltante
+    (debería estar y no está). Cuantifique ambos por material.
+ 3. Escriba las reglas de depuración de manera declarativa, en un bloque
+    de código que produzca dos salidas: un informe con el número de
+    registros que viola cada regla y el conjunto depurado. El conjunto
+    depurado debe ser función determinista del archivo crudo; ninguna
+    corrección se hace a mano. Al menos deben detectarse duplicados
+    exactos, valores fuera de dominio en las escalas de valoración, un
+    código centinela en una variable numérica, inconsistencias entre las
+    dos fechas, variantes de escritura en una variable categórica y una
+    columna numérica con unidades mezcladas. Para esta última,
+    justifique la corrección con el argumento del cociente entre modos
+    visto en clase (mezcla de dos normales en escala logarítmica,
+    intervalo bootstrap del cociente, comparación con una tabla de
+    factores fijada de antemano) y no con la mera inspección. Aplique
+    las reglas que declaró en la parte 1c y reporte el número de filas
+    del conjunto depurado, que debe coincidir con el diseño.
+ 4. La escolaridad tiene datos faltantes. Compare la distribución de |rural| y |macrozona| entre los registros con y sin escolaridad, y discuta si el
+    mecanismo parece completamente aleatorio. Explique qué sesgo
+    introduciría imputar por la moda y qué alternativa usaría si
+    necesitara la variable completa.
+
+
+  5 Parte 3. Análisis exploratorio y visualización (25 puntos)
+
+ 1. Presente la estructura de la muestra en una tabla: casos por
+    macrozona y tramo, y cuidadores que evalúan cada material. Verifique
+    que coincide con el diseño declarado.
+ 2. Construya la *figura principal* del informe: la proporción de uso
+    frecuente de cada material en cada macrozona, con su intervalo de
+    Wald del 95 % bajo muestreo aleatorio simple (la corrección por
+    conglomerados se hace en la parte 4). Justifique la elección de
+    canales perceptuales (qué variable va a la posición, qué variable al
+    color o a las facetas) con la jerarquía de Cleveland y McGill, y
+    explique por qué no usó un gráfico de torta ni barras apiladas.
+    Muestre, en una figura secundaria, una versión deliberadamente mala
+    del mismo contenido y señale qué la hace mala.
+ 3. Describa la distribución de |indice_conocimientos| por escolaridad y por tramo con resúmenes robustos (mediana,
+    cuartiles) y con un gráfico adecuado para comparar distribuciones.
+    Comente la forma, los valores extremos y si la media es un resumen
+    apropiado.
+ 4. Explore la relación entre |lectura_semana| y |indice_conocimientos|. Ambas son discretas o acotadas y el gráfico de dispersión sufre
+    sobreploteo; resuélvalo.
+ 5. Compare la diferencia de medias del índice de conocimientos entre
+    uso frecuente y no frecuente del /Cuaderno de Espera/ en toda la
+    muestra y dentro de cada nivel de escolaridad. Explique lo que
+    observa en términos de confusión, de la cual la paradoja de Simpson
+    es el caso extremo, y nombre la variable que la produce y por qué
+    (piense en qué determina a la vez el uso y el índice).
+ 6. Construya las codificaciones numéricas necesarias (uso frecuente
+    como 0 o 1 por material, escolaridad como ordinal de 1 a 4,
+    ruralidad como 0 o 1) y visualice la matriz de correlaciones entre
+    ellas y las variables numéricas originales, con el coeficiente que
+    corresponda a la escala de cada par (justifíquelo) y con un
+    reordenamiento por agrupamiento jerárquico que haga visible su
+    estructura.
+
+Todas las figuras deben tener título, ejes rotulados con unidades,
+paleta adecuada a la escala del dato y leerse en escala de grises.
+
+
+  6 Parte 4. Inferencia (25 puntos)
+
+ 1. Para cada material, estime la proporción nacional de uso frecuente
+    con su intervalo de Wald del 95 % bajo muestreo aleatorio simple.
+    Estime luego la correlación intraclase del uso frecuente dentro de
+    los centros de salud con el estimador
+
+    ρ^I=CMB−CMDCMB+(m¯−1)CMD,
+
+    donde CMB y CMD son los cuadrados medios entre y dentro de centros
+    del análisis de varianza de un factor aplicado al indicador 0 o 1 de
+    uso frecuente, calculados sobre los cuidadores que recibieron el
+    material, y
+
+    m¯
+
+    el número medio de esos cuidadores por centro (aproximación
+    aceptable aunque los centros tengan tamaños distintos). Calcule el
+    efecto de diseño
+
+    deff=1+(m¯−1)ρ^I
+
+    de cada material y corrija los intervalos multiplicando el error
+    estándar por
+    deff
+
+    . Comente cuánto cambia la precisión. Si
+
+    ρ^I
+
+    resulta negativo, trúnquelo en cero y explique por qué puede ocurrir.
+ 2. Contraste, con el test de Wald para dos proporciones independientes
+    (sin corrección por conglomerados), si el uso frecuente del /
+    Cuaderno de Espera/ difiere entre la Región Metropolitana y el
+    Norte, y si el uso frecuente de /Cuentos para Conversar/ difiere
+    entre Centro y Sur. Reporte estimación, intervalo y valor
+    p
+
+    bilateral, y discuta en cada caso la significación estadística
+    frente a la magnitud, comparándola con el efecto mínimo relevante
+    que declaró en la parte 1.
+ 3. Realice las seis comparaciones por pares entre macrozonas para cada
+    uno de los cuatro materiales, con el mismo test de la parte b. Trate
+    los 24 contrastes como una sola familia. Presente los valores
+    p
+
+    ordenados en una tabla y aplique la corrección que declaró en la
+    parte 1b y también la otra (control del error global con Bonferroni
+    o Holm frente a tasa de falsos descubrimientos con Benjamini y
+    Hochberg, en su versión para valores
+    p
+
+    independientes). Indique qué diferencias sobreviven a cada
+    corrección y explique a qué se debe la diferencia entre ambas.
+ 4. Contraste la independencia entre uso (tres niveles) y macrozona para
+    el /Maletín Explorador/, entre quienes lo recibieron, con el test
+    χ2
+
+    de Pearson sobre la tabla de contingencia de 4 por 3. Reporte el
+    estadístico, los grados de libertad y el valor
+    p
+
+    , y compare la conclusión con la de las comparaciones por pares de
+    ese material.
+ 5. Estime la diferencia de medianas del índice de conocimientos entre
+    quienes usan con frecuencia el /Cuaderno de Espera/ y quienes nunca
+    lo usan, con su intervalo bootstrap de percentiles del 95 % con al
+    menos 2.000 réplicas, y obtenga el valor
+    p
+
+    de un test de permutación para la misma diferencia con al menos
+    5.000 permutaciones. Explique por qué esa diferencia, aunque sea
+    estadísticamente clara, no puede interpretarse como el efecto del
+    material, nombrando la variable que lo impide y qué diseño
+    permitiría estimarlo.
+
+
+  7 Parte 5. Potencia y tamaño de la muestra (15 puntos)
+
+En esta parte use los tamaños de diseño de la tabla de la sección 2 (600
+por macrozona, 840 para /Cuentos para Conversar/), no los tamaños
+observados tras la no recepción, y señale en una línea cuánto reduce la
+precisión el hecho de que sólo una fracción de los elegibles recibió
+cada material.
+
+ 1. Calcule el margen de error del 95 % en el caso más desfavorable (
+    p=0,5
+
+    ) para la estimación nacional (
+    n=2.400
+
+    ), para cada macrozona (
+    n=600
+
+    ) y para /Cuentos para Conversar/ (
+    n=840
+
+    ), primero bajo muestreo aleatorio simple y luego con el efecto de
+    diseño estimado en la parte 4a (el de cada material para las cifras
+    por material, el mayor de los cuatro para las cifras nacionales y
+    por macrozona). Verifique si el estudio cumple el 3,5 % exigido y en
+    qué condiciones.
+ 2. Calcule la *diferencia mínima detectable* con potencia 0,80 y
+    α=0,05
+
+    bilateral, en el caso
+    p=0,5
+
+    , entre dos macrozonas para un material evaluado por toda la muestra
+    (600 contra 600) y para /Cuentos para Conversar/ (210 contra 210),
+    sin y con el efecto de diseño. Compare con las diferencias que
+    declaró como relevantes en la parte 1 y responda si el estudio fue
+    capaz de detectarlas.
+ 3. El servicio quiere un seguimiento en 2027 que detecte, con potencia
+    0,80, una diferencia de 5 puntos porcentuales en el uso frecuente
+    entre cualquier par de macrozonas, para cualquier material, con las
+    seis comparaciones por pares de cada material controladas por
+    Bonferroni (
+    α=0,05/6
+
+    por contraste). Suponga
+    p=0,5
+
+    , efecto de diseño 1,5, tasa de respuesta de 80 %, la misma regla de
+    elegibilidad por tramo que en 2025 y la misma proporción entre
+    tramos del diseño de 2025 (20 %, 20 %, 25 % y 35 % por macrozona).
+    Con esos supuestos la restricción la impone el material que evalúa
+    un solo tramo. Calcule el número de cuidadores a contactar en ese
+    tramo por macrozona, luego en los demás tramos, y el total nacional.
+    Verifique la potencia del diseño resultante por simulación (basta
+    simular muestreo aleatorio simple con el tamaño efectivo
+    n/deff
+
+    ). Si el total le parece impracticable para un servicio público,
+    dígalo, explique cuál de los supuestos lo encarece más y proponga
+    qué diferencia sí sería detectable con un total de 4.000 cuidadores
+    contactados.
+ 4. Escriba, para una autoridad sin formación estadística, un párrafo de
+    a lo más 200 palabras que explique la diferencia entre el margen de
+    error de una estimación, la potencia para detectar una diferencia, y
+    el error global frente al error por estrato cuando se comparan
+    muchas regiones. El párrafo debe permitirle entender por qué un
+    estudio con “error del 2 %” no puede afirmar que dos regiones
+    difieren en 4 puntos.
+
+
+  8 Parte 6. Marco legal de los datos (5 puntos)
+
+Responda en a lo más 250 palabras cada pregunta, citando la norma que
+corresponda.
+
+ 1. Identifique qué columnas del archivo constituyen datos personales y
+    cuáles datos sensibles según la Ley 19.628 y su reemplazo, la Ley
+    21.719, que entra en vigencia el 1 de diciembre de 2026. Considere
+    en particular la pertenencia a pueblos originarios, la condición
+    migrante, los datos de salud del niño o niña y el hecho de que los
+    datos se refieren a menores de edad. Proponga las medidas de
+    seudonimización y minimización que aplicaría antes de entregar la
+    base a terceros.
+ 2. Un medio de comunicación solicita, mediante la Ley 20.285 sobre
+    acceso a la información pública, la base de datos completa del
+    estudio. Argumente qué se puede entregar y qué no, y cómo
+    construiría un archivo de uso público que conserve la utilidad
+    estadística sin permitir la reidentificación. Mencione el principio
+    de secreto estadístico que consagra la Ley 17.374 para las
+    estadísticas oficiales.
+ 3. Discuta si la encuesta requiere consentimiento informado y de quién,
+    considerando que responde el cuidador adulto sobre un niño o niña, y
+    qué exige al respecto la Ley 21.430 sobre garantías y protección
+    integral de los derechos de la niñez. Indique si, a su juicio, la
+    evaluación de un programa público sin intervención sobre las
+    personas queda dentro del ámbito de la Ley 20.120 sobre
+    investigación científica en seres humanos.
+
+
+  9 Pauta de evaluación
+
+Parte 	Criterio principal 	Puntos
+1 	Hipótesis contrastables con efecto mínimo relevante declarado antes
+del análisis 	10
+2 	Clasificación correcta de variables; depuración declarativa,
+reproducible y justificada 	20
+3 	Figuras correctas en canales, escalas y paleta; lectura estadística
+de las distribuciones; Simpson 	25
+4 	Intervalos y contrastes correctos, con deff; corrección por
+comparaciones múltiples; bootstrap y permutación; lectura no causal 	25
+5 	Margen de error, diferencia mínima detectable y tamaño de muestra
+correctos y verificados; explicación clara 	15
+6 	Identificación correcta de datos sensibles y de las obligaciones
+legales; argumentación 	5
+
+Se descuenta hasta un 20 % de la nota por figuras sin rótulos o con
+paletas inadecuadas, por código que no se ejecuta de principio a fin, y
+por conclusiones causales no justificadas. Los apuntes de la unidad de
+inferencia y el apunte de la clase 4 contienen todas las funciones
+necesarias; puede usar |numpy|, |pandas| o |polars|, |scipy|, |matplotlib| y |statsmodels|, y no se requiere ninguna otra biblioteca.
+
