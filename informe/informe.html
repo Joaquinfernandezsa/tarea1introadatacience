@@ -1,0 +1,1242 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Tarea 1 INF396</title><style>
+@page { size: A4; margin: 17mm 16mm 16mm 16mm; }
+body { font-family: "DejaVu Serif", Georgia, serif; font-size: 9.6pt; line-height: 1.3; color: #111; }
+h1 { font-size: 15pt; margin: 0 0 4pt 0; } h2 { font-size: 12pt; margin: 11pt 0 4pt 0; border-bottom: 1px solid #999; }
+p { margin: 3pt 0 5pt 0; text-align: left; }
+table { border-collapse: collapse; font-size: 7.8pt; margin: 4pt auto 6pt auto; font-family: "DejaVu Sans", Arial, sans-serif; }
+th, td { border: 1px solid #bbb; padding: 1.5pt 4pt; vertical-align: top; } th { background: #eee; }
+img { display: block; margin: 4pt auto 2pt auto; max-width: 100%; }
+p:has(> img) { page-break-inside: avoid; margin: 4pt 0; }
+img.fig-s { max-width: 60%; } img.fig-m { max-width: 76%; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; }
+</style>
+<script>window.MathJax = { tex: { inlineMath: [['$', '$']] }, startup: { typeset: true } };</script>
+<script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head><body><h1>Evaluación del Programa Semillas: tipos de datos, visualización e inferencia</h1>
+<p><strong>Tarea 1 · INF396 Introducción a la Ciencia de Datos</strong> · Joaquín Fernández · octubre de 2026</p>
+<p><strong>Declaración de uso de IA.</strong> El código del cuaderno <code>tarea1_fernandez_joaquin.ipynb</code> y la primera redacción de todas las secciones
+de este informe se generaron con ayuda de Claude Code (Anthropic), a partir del enunciado y de los resultados que produce el cuaderno.
+El autor revisó el código, los números y el texto, y es responsable de lo que aquí se afirma. Las conclusiones legales de la parte 6
+son una lectura propia de las normas citadas, no asesoría jurídica.</p>
+<h2>1. Plan de análisis (preinscrito antes de abrir el archivo)</h2>
+<p><strong>1a. Hipótesis contrastables.</strong> Nivel $\alpha = 0{,}05$ bilateral en todos los casos.</p>
+<table>
+<thead>
+<tr>
+<th>Pregunta</th>
+<th>$H_0$</th>
+<th>$H_1$</th>
+<th>Estadístico</th>
+<th>Efecto mínimo relevante (EMR)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cobertura y uso</td>
+<td>La proporción de uso frecuente de cada material es igual en las cuatro macrozonas</td>
+<td>Difiere en al menos un par</td>
+<td>Test de Wald para dos proporciones, por pares, familia de 24 contrastes</td>
+<td>10 puntos porcentuales</td>
+</tr>
+<tr>
+<td>Pertinencia y valoración</td>
+<td>Al menos el 80 % de quienes reciben cada material lo considera pertinente ($p \ge 0{,}80$)</td>
+<td>$p &lt; 0{,}80$</td>
+<td>Test de Wald para una proporción, unilateral</td>
+<td>10 pp bajo la meta (70 %)</td>
+</tr>
+<tr>
+<td>Resultados</td>
+<td>La mediana del índice de conocimientos es igual entre quienes usan con frecuencia el Cuaderno y quienes nunca lo usan</td>
+<td>Difiere</td>
+<td>Test de permutación de la diferencia de medianas; IC bootstrap</td>
+<td>5 puntos del índice</td>
+</tr>
+</tbody>
+</table>
+<p><em>Por qué esos efectos.</em> Una brecha de 10 pp en uso frecuente entre macrozonas equivale a que, de cada diez familias que reciben el
+material, una más lo deje en el cajón: es el umbral desde el cual el servicio redistribuiría acompañamiento o rediseñaría la entrega
+en una zona. Una pertinencia bajo 70 % (meta 80 %) justifica rediseñar el material para la edad. Cinco puntos del índice (0-100)
+es media desviación de lo que separa a un cuidador con educación básica de uno con media; menos que eso no cambia una decisión de
+continuidad.</p>
+<p><strong>1b. Control del error en la familia de la parte 4c.</strong> Se aplicará <strong>Holm</strong> (control fuerte del error global, FWER, al 5 %). Un falso
+positivo lleva al servicio a intervenir una macrozona (logística, capacitación, presupuesto) por una diferencia que no existe, y a
+explicar públicamente una brecha territorial inexistente; ese costo es alto y concentrado, por lo que conviene controlar la
+probabilidad de cometer <em>al menos un</em> error en la familia. Benjamini-Hochberg (FDR) se reportará como comparación, porque sería la
+elección si el objetivo fuera sólo priorizar zonas para una segunda mirada.</p>
+<p><strong>1c. Reglas de exclusión y corrección, fijadas antes de ver los datos.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Problema</th>
+<th>Acción</th>
+<th>Regla</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Duplicado exacto</td>
+<td>Se excluye</td>
+<td>Se conserva la primera aparición de cada fila repetida; luego se verifica que <code>id_cuidador</code> no se repita.</td>
+</tr>
+<tr>
+<td>Valor fuera de dominio (escalas 1-5, índice 0-100, lectura 0-7, edades)</td>
+<td>Se marca faltante</td>
+<td>El registro se conserva; el valor pasa a <code>NaN</code>.</td>
+</tr>
+<tr>
+<td>Código centinela en una numérica (p. ej. −99, 999)</td>
+<td>Se marca faltante</td>
+<td>Idem; se detecta como valor imposible y repetido.</td>
+</tr>
+<tr>
+<td>Inconsistencia entre fechas (entrega posterior a la encuesta, fecha no interpretable)</td>
+<td>Se marca faltante la fecha de entrega</td>
+<td>No se usa en el análisis; el registro se conserva.</td>
+</tr>
+<tr>
+<td>Variante de escritura en una categórica</td>
+<td>Se corrige</td>
+<td>Mapa a la forma canónica tras quitar tildes, mayúsculas y espacios.</td>
+</tr>
+<tr>
+<td>Columna numérica con unidades mezcladas</td>
+<td>Se corrige</td>
+<td>Sólo si una mezcla de dos normales en escala log y el IC bootstrap del cociente de modos validan un factor de una tabla fijada de antemano (1.000 kg→g; 453,6 lb→g; 28,35 oz→g; 100; 10). Si ningún factor es compatible, se marca faltante.</td>
+</tr>
+<tr>
+<td>Inconsistencia lógica (uso informado sin recibir; material informado en tramo no elegible)</td>
+<td>Se marca faltante</td>
+<td>Se reporta; el registro se conserva.</td>
+</tr>
+</tbody>
+</table>
+<p>El plan no se modificó después. Donde el análisis se apartó de él se indica en la sección correspondiente.</p>
+<h2>2. Tipos de variables y depuración</h2>
+<p><strong>2a. Clasificación de columnas.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Columna(s)</th>
+<th>Escala</th>
+<th>Estructura</th>
+<th>Operaciones con sentido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id_cuidador</code></td>
+<td>nominal</td>
+<td>identificador</td>
+<td>contar, unir; ninguna aritmética</td>
+</tr>
+<tr>
+<td><code>id_centro</code></td>
+<td>nominal</td>
+<td>conglomerado</td>
+<td>agrupar; define la unidad de muestreo y el deff</td>
+</tr>
+<tr>
+<td><code>macrozona</code>, <code>region</code>, <code>rural</code>, <code>sexo_cuidador</code>, <code>migrante</code>, <code>pueblo_originario</code></td>
+<td>nominal</td>
+<td>categórica (dicotómicas codificables 0/1)</td>
+<td>frecuencias y proporciones</td>
+</tr>
+<tr>
+<td><code>tramo</code>, <code>escolaridad</code></td>
+<td>ordinal</td>
+<td>categórica ordenada</td>
+<td>orden, mediana; promediar sólo codificada y suponiendo distancias iguales</td>
+</tr>
+<tr>
+<td><code>uso_&lt;m&gt;</code></td>
+<td>ordinal (Nunca &lt; Ocasional &lt; Frecuente)</td>
+<td>categórica ordenada</td>
+<td>orden, proporción por nivel; promediar no tiene sentido sin codificar</td>
+</tr>
+<tr>
+<td><code>valoracion_&lt;m&gt;</code></td>
+<td>ordinal (Likert 1-5)</td>
+<td>categórica ordenada</td>
+<td>mediana, % en 4-5; la media exige suponer equidistancia</td>
+</tr>
+<tr>
+<td><code>recibio_&lt;m&gt;</code>, <code>pertinente_&lt;m&gt;</code></td>
+<td>nominal</td>
+<td>categórica dicotómica</td>
+<td>proporción</td>
+</tr>
+<tr>
+<td><code>edad_meses</code>, <code>semanas_gestacion</code>, <code>peso_nacimiento</code>, <code>edad_cuidador</code></td>
+<td>razón</td>
+<td>numérica</td>
+<td>media, mediana, diferencias y cocientes (peso exige unidad única)</td>
+</tr>
+<tr>
+<td><code>n_hijos</code>, <code>lectura_semana</code></td>
+<td>razón (conteo)</td>
+<td>numérica discreta</td>
+<td>media, mediana; <code>lectura_semana</code> está acotada en 0-7</td>
+</tr>
+<tr>
+<td><code>indice_conocimientos</code></td>
+<td>intervalo (0-100)</td>
+<td>numérica</td>
+<td>media, mediana, diferencias; los cocientes no tienen sentido</td>
+</tr>
+<tr>
+<td><code>fecha_entrega</code>, <code>fecha_encuesta</code></td>
+<td>intervalo (fecha)</td>
+<td>fecha; cíclica en día de semana o mes</td>
+<td>diferencias entre fechas; no se promedian sin convertir</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2b. Vacío estructural vs. dato faltante.</strong> Un cuidador es elegible para un material si su tramo es el de entrega o uno posterior;
+las columnas de <code>uso</code>, <code>valoracion</code> y <code>pertinente</code> exigen además haber recibido el material. Sobre el archivo crudo
+(2.435 filas) se obtiene:</p>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Elegibles</th>
+<th><code>recibio</code>: vacío estructural</th>
+<th><code>recibio</code>: faltante</th>
+<th><code>uso</code>/<code>valoracion</code>/<code>pertinente</code>: vacío estructural</th>
+<th>faltantes en <code>uso</code> / <code>valoracion</code> / <code>pertinente</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cuaderno de Espera</td>
+<td>2.435</td>
+<td>0</td>
+<td>0</td>
+<td>189</td>
+<td>0 / 0 / 0</td>
+</tr>
+<tr>
+<td>Caja de los Primeros Meses</td>
+<td>1.946</td>
+<td>489</td>
+<td>0</td>
+<td>720</td>
+<td>0 / 0 / 0</td>
+</tr>
+<tr>
+<td>Maletín Explorador</td>
+<td>1.459</td>
+<td>976</td>
+<td>0</td>
+<td>1.261</td>
+<td>0 / 0 / 0</td>
+</tr>
+<tr>
+<td>Cuentos para Conversar</td>
+<td>851</td>
+<td>1.584</td>
+<td>0</td>
+<td>1.768</td>
+<td>0 / 0 / 0</td>
+</tr>
+</tbody>
+</table>
+<p>Todo vacío de las columnas de materiales es estructural (no elegible o no recibió). El dato faltante real está en otras columnas:
+<code>escolaridad</code> (136 tras depurar) y, una vez convertidos los centinelas, <code>indice_conocimientos</code> (48).</p>
+<p><strong>2c. Depuración declarativa.</strong> Cada regla es una función del archivo crudo que devuelve las filas que la violan y una acción;
+el bloque produce el informe y el conjunto depurado sin corrección manual (celdas «Reglas declarativas» del cuaderno). Resultado:
+<strong>2.435 → 2.400 filas</strong>, exactamente el diseño (120/120/150/210 por macrozona; se verifica con un <code>assert</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Acción</th>
+<th>Registros</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>duplicado exacto (toda la fila repetida)</td>
+<td>excluir</td>
+<td>35</td>
+</tr>
+<tr>
+<td>region: variante de escritura (mayúsculas/tildes)</td>
+<td>corregir</td>
+<td>83</td>
+</tr>
+<tr>
+<td>indice_conocimientos: código centinela -99</td>
+<td>faltante</td>
+<td>48</td>
+</tr>
+<tr>
+<td>valoracion_cuaderno fuera de la escala 1-5</td>
+<td>faltante</td>
+<td>21</td>
+</tr>
+<tr>
+<td>valoracion_caja fuera de la escala 1-5</td>
+<td>faltante</td>
+<td>16</td>
+</tr>
+<tr>
+<td>valoracion_maletin fuera de la escala 1-5</td>
+<td>faltante</td>
+<td>13</td>
+</tr>
+<tr>
+<td>valoracion_cuentos fuera de la escala 1-5</td>
+<td>faltante</td>
+<td>8</td>
+</tr>
+<tr>
+<td>peso_nacimiento en kilogramos (valor &lt; 132 g, componente 1 de la mezcla)</td>
+<td>corregir</td>
+<td>112</td>
+</tr>
+<tr>
+<td>fecha_entrega posterior a fecha_encuesta</td>
+<td>faltante</td>
+<td>23</td>
+</tr>
+<tr>
+<td>Otras 15 reglas (id repetido, región fuera de su macrozona, índice fuera de 0-100, edad fuera de tramo, semanas de gestación, lectura 0-7, edad del cuidador, uso informado sin recibir, material en tramo no elegible, fecha no interpretable)</td>
+<td>—</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p><em>Unidades mezcladas en <code>peso_nacimiento</code>.</em> En escala $\log_{10}$ el peso tiene dos modas (figura 1). Una mezcla de dos normales
+ajustada por EM da componentes con modas 3,17 y 3.264 (pesos 5,9 % y
+94,1 %) y un <strong>cociente de modas de 1.029,6, con IC bootstrap del 95 % [998,5; 1.066,2]</strong>
+(500 réplicas). De la tabla de factores fijada en 1c, el único compatible con el intervalo es <strong>kg → g (1.000)</strong>; 453,6 y 28,35
+quedan fuera. Por eso los 112 valores del componente bajo (umbral de decisión de la mezcla:
+132 g) se multiplican por 1.000. La inspección («parecen kilos») sólo sugiere; el intervalo del cociente es lo que
+autoriza el factor. Tras corregir, el peso queda en 1.520-4.833 g, con una sola moda.</p>
+<p><img alt="Figura 1. Mezcla de dos normales del peso al nacer en escala log10." class="fig-s" src="fig/f00_peso_mezcla.png" /></p>
+<p><strong>2d. Faltantes en <code>escolaridad</code>.</strong> Faltan 136 valores (5,7 %). Si el mecanismo fuera completamente
+aleatorio (MCAR), la tasa de faltante sería la misma en todo subgrupo. No lo es: falta en el 11,3 % de los
+rurales y en el 4,0 % de los urbanos ($\chi^2$ = 40,2, gl = 1,
+p &lt; 0,001); por macrozona va de 3,0 % en RM a 10,2 % en Sur
+($\chi^2$ = 33,0, gl = 3, p &lt; 0,001). Entre los registros sin escolaridad el
+44,9 % es rural y el 44,9 % es del Sur,
+frente a 21,1 % y 23,8 % entre los
+que sí la tienen. El mecanismo depende de variables observadas (al menos MAR, no MCAR). Imputar por la moda («Media») asignaría
+educación media a cuidadores que son desproporcionadamente rurales y del Sur, donde la escolaridad básica es más frecuente: inflaría
+la categoría modal, reduciría la varianza y sesgaría hacia arriba la escolaridad de esos grupos, atenuando la relación
+escolaridad-índice. Si necesitara la variable completa usaría imputación múltiple (o, al menos, imputación por regresión/modelo
+condicionada a <code>rural</code>, <code>macrozona</code>, <code>tramo</code>, <code>indice_conocimientos</code> y <code>lectura_semana</code>), reportando la varianza entre imputaciones;
+para las tablas de este informe simplemente se excluye el faltante y se declara.</p>
+<h2>3. Análisis exploratorio y visualización</h2>
+<p><strong>3a. Estructura de la muestra.</strong> Coincide con el diseño: 600 por macrozona, 120/120/150/210 por tramo.</p>
+<table>
+<thead>
+<tr>
+<th>Tramo</th>
+<th>Norte</th>
+<th>Centro</th>
+<th>RM</th>
+<th>Sur</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gestante</td>
+<td>120</td>
+<td>120</td>
+<td>120</td>
+<td>120</td>
+<td>480</td>
+</tr>
+<tr>
+<td>0-11 meses</td>
+<td>120</td>
+<td>120</td>
+<td>120</td>
+<td>120</td>
+<td>480</td>
+</tr>
+<tr>
+<td>12-35 meses</td>
+<td>150</td>
+<td>150</td>
+<td>150</td>
+<td>150</td>
+<td>600</td>
+</tr>
+<tr>
+<td>36-59 meses</td>
+<td>210</td>
+<td>210</td>
+<td>210</td>
+<td>210</td>
+<td>840</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td>600</td>
+<td>600</td>
+<td>600</td>
+<td>600</td>
+<td>2.400</td>
+</tr>
+</tbody>
+</table>
+<p>Cuidadores que evalúan cada material: Cuaderno 2.400, Caja 1.920, Maletín 1.440,
+Cuentos 840 (elegibles por tramo). Recibieron el material: 2.213, 1.692,
+1.162 y 656; es decir, cobertura nacional (promedio de macrozonas) de
+92,2 %, 88,1 %, 80,7 % y 78,1 %.</p>
+<p><strong>3b. Figura principal.</strong></p>
+<p><img alt="Figura 2. Uso frecuente por material y macrozona, con IC de Wald 95 % (MAS)." src="fig/f01_principal_uso_frecuente.png" /></p>
+<p><em>Canales.</em> La variable que se compara (proporción de uso frecuente) va a la <strong>posición en una escala común</strong> (eje vertical, el canal más
+preciso en la jerarquía de Cleveland y McGill); la macrozona va a la <strong>posición en el eje horizontal</strong> dentro de cada panel, y el
+material a las <strong>facetas</strong>, de modo que cada comparación entre macrozonas se hace dentro de un panel con el mismo eje. El intervalo se
+codifica con <strong>longitud</strong> (barra de error), el siguiente canal en precisión. No se usa el color para codificar datos: todo se lee en
+escala de grises. No se usó un gráfico de torta porque obligaría a juzgar <strong>ángulos y áreas</strong> (los canales menos precisos) y además no
+admite intervalos de confianza; no se usaron barras apiladas porque sólo el segmento inferior tiene una base común: los demás se
+comparan por <strong>longitud sin alineación</strong>, y cuatro materiales con distinto denominador (quienes lo recibieron) no suman nada
+interpretable.</p>
+<p><img alt="Figura 3. Versión deliberadamente mala del mismo contenido." class="fig-s" src="fig/f02_mala.png" /></p>
+<p><em>Qué hace mala a la figura 3.</em> Apila proporciones con distinto denominador (la suma «202 %» no
+significa nada); el eje parte en 150, lo que exagera la diferencia entre Sur y el resto; las barras de arriba no comparten base y no se
+pueden comparar; usa la paleta <em>jet</em>, que en escala de grises es indistinguible y cuyo brillo no es monótono; no hay intervalos, el
+título es «uso» y los ejes no tienen rótulo ni unidad.</p>
+<p><strong>3c. Índice de conocimientos por escolaridad y por tramo.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Escolaridad</th>
+<th>n</th>
+<th>Q1</th>
+<th>Mediana</th>
+<th>Q3</th>
+<th>Media</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Básica</td>
+<td>335</td>
+<td>46,8</td>
+<td>56,3</td>
+<td>65,2</td>
+<td>56,1</td>
+</tr>
+<tr>
+<td>Media</td>
+<td>952</td>
+<td>53,8</td>
+<td>62,9</td>
+<td>72,3</td>
+<td>62,9</td>
+</tr>
+<tr>
+<td>Técnica</td>
+<td>539</td>
+<td>60,6</td>
+<td>69,2</td>
+<td>79,0</td>
+<td>69,6</td>
+</tr>
+<tr>
+<td>Universitaria</td>
+<td>392</td>
+<td>64,8</td>
+<td>74,6</td>
+<td>83,7</td>
+<td>74,6</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Tramo</th>
+<th>n</th>
+<th>Q1</th>
+<th>Mediana</th>
+<th>Q3</th>
+<th>Media</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gestante</td>
+<td>471</td>
+<td>50,0</td>
+<td>59,1</td>
+<td>68,6</td>
+<td>58,8</td>
+</tr>
+<tr>
+<td>0-11 meses</td>
+<td>471</td>
+<td>54,4</td>
+<td>63,0</td>
+<td>73,5</td>
+<td>63,8</td>
+</tr>
+<tr>
+<td>12-35 meses</td>
+<td>585</td>
+<td>56,5</td>
+<td>66,4</td>
+<td>74,4</td>
+<td>65,8</td>
+</tr>
+<tr>
+<td>36-59 meses</td>
+<td>825</td>
+<td>59,7</td>
+<td>70,0</td>
+<td>80,2</td>
+<td>69,9</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Figura 4. Distribución del índice por escolaridad y por tramo (cajas, media y puntos)." src="fig/f03_indice_boxplot.png" /></p>
+<p>La mediana sube monótonamente con la escolaridad (56,3 → 74,6) y
+con el tramo (59,1 → 70,0); los rangos intercuartílicos son parecidos
+(18-20 puntos), así que las distribuciones se desplazan sin cambiar mucho de dispersión. La forma es aproximadamente simétrica
+(asimetría global -0,02), con cola corta hacia abajo (mínimos de 16-38) y techo en 100 que recorta levemente la cola
+superior en los grupos altos. Los valores extremos son pocos y plausibles, no errores. Como media y mediana casi coinciden en cada grupo,
+la media es un resumen apropiado para describir y comparar; la mediana se mantiene en la parte 4e porque es robusta al techo de la escala.</p>
+<p><strong>3d. Lectura semanal e índice.</strong></p>
+<p><img alt="Figura 5. Lectura semanal vs. índice: jitter con transparencia y mediana por día (izq.) y hexbin (der.)." src="fig/f04_lectura_indice.png" /></p>
+<p><code>lectura_semana</code> toma ocho valores, de modo que un diagrama de dispersión crudo apila cientos de puntos en ocho columnas. Se resolvió
+con <strong>jitter horizontal, transparencia y la mediana por día</strong> (izquierda) y con <strong>densidad en celdas hexagonales</strong> (derecha). La relación
+es positiva y monótona: la mediana del índice pasa de 59,4 con 0 días a
+73,7 con 7 días ($\rho$ de Spearman = 0,27, n = 1.881), con mucha
+dispersión dentro de cada día.</p>
+<p><strong>3e. Uso frecuente del Cuaderno e índice: toda la muestra y por escolaridad.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Estrato</th>
+<th>n frecuente</th>
+<th>Media frecuente</th>
+<th>n no frecuente</th>
+<th>Media no frecuente</th>
+<th>Diferencia</th>
+<th>% con uso frecuente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Toda la muestra</td>
+<td>1.013</td>
+<td>69,3</td>
+<td>1.158</td>
+<td>62,8</td>
+<td>6,6</td>
+<td>46,7 %</td>
+</tr>
+<tr>
+<td>Básica</td>
+<td>96</td>
+<td>59,7</td>
+<td>208</td>
+<td>54,5</td>
+<td>5,2</td>
+<td>31,6 %</td>
+</tr>
+<tr>
+<td>Media</td>
+<td>398</td>
+<td>65,7</td>
+<td>485</td>
+<td>61,2</td>
+<td>4,5</td>
+<td>45,1 %</td>
+</tr>
+<tr>
+<td>Técnica</td>
+<td>249</td>
+<td>72,8</td>
+<td>248</td>
+<td>67,0</td>
+<td>5,8</td>
+<td>50,1 %</td>
+</tr>
+<tr>
+<td>Universitaria</td>
+<td>210</td>
+<td>77,0</td>
+<td>156</td>
+<td>72,4</td>
+<td>4,6</td>
+<td>57,4 %</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Figura 6. Media del índice según uso del Cuaderno, por escolaridad." class="fig-s" src="fig/f05_simpson.png" /></p>
+<p>En toda la muestra la diferencia es de 6,6 puntos, pero dentro de cada nivel de escolaridad es menor
+(4,5 a 5,8). Es <strong>confusión por escolaridad</strong>: la escolaridad determina
+a la vez el uso (uso frecuente del 31,6 % en básica al 57,4 % en universitaria) y el índice
+(medianas de 56,3 a 74,6). Al comparar usuarios frecuentes con el resto en la
+muestra completa se compara, en parte, cuidadores más escolarizados con menos escolarizados, y una fracción de la brecha es de la
+escolaridad, no del material. Aquí la confusión atenúa sin invertir el signo; la paradoja de Simpson es el caso extremo en que el signo
+dentro de los estratos es contrario al global. La lectura honesta de la asociación es la diferencia dentro de estratos (unos 5 puntos),
+que es justo el EMR declarado.</p>
+<p><strong>3f. Matriz de correlaciones.</strong></p>
+<p><img alt="Figura 7. Correlaciones entre codificaciones y variables numéricas, reordenadas por agrupamiento jerárquico." class="fig-m" src="fig/f06_correlaciones.png" /></p>
+<p>Se codificó uso frecuente como 0/1 por material, <code>escolaridad</code> como 1-4 y <code>rural</code> como 0/1. El coeficiente depende de la escala del par:
+<strong>Spearman</strong> cuando interviene una ordinal (escolaridad, valoraciones), porque sólo el orden es interpretable y la codificación 1-4 no
+garantiza equidistancia (65 pares); <strong>Pearson</strong> entre numéricas y con binarias (55 pares), donde
+coincide con el punto-biserial (numérica-binaria) y con $\phi$ (binaria-binaria). El reordenamiento (enlace promedio sobre la distancia
+$1-|r|$) deja ver tres bloques: (i) cada indicador de uso frecuente con la valoración del mismo material ($r_s$ = 0,32-0,37) y con
+<code>lectura_semana</code> (0,29-0,31); (ii) <code>escolaridad</code>, <code>lectura_semana</code> e <code>indice_conocimientos</code> (0,40 entre escolaridad e índice),
+con <code>rural</code> en negativo (−0,21 con escolaridad); (iii) las demográficas del niño y del cuidador (<code>peso_nacimiento</code>, <code>edad_cuidador</code>,
+<code>n_hijos</code>), prácticamente incorrelacionadas con todo. Ninguna correlación supera 0,40: las asociaciones son reales pero modestas.</p>
+<h2>4. Inferencia</h2>
+<p><strong>4a. Proporción nacional de uso frecuente, correlación intraclase y efecto de diseño.</strong> La estimación nacional promedia las cuatro
+macrozonas con peso igual, $\hat p = \frac14\sum_z \hat p_z$, con $\mathrm{EE} = \frac14\sqrt{\sum_z \hat p_z(1-\hat p_z)/n_z}$. Si
+las macrozonas tuvieran pesos poblacionales distintos (la RM concentra cerca del 40 % de los nacimientos), el promedio ponderado se
+movería hacia el valor de la RM y el error estándar cambiaría según $\sum_z w_z^2 \mathrm{Var}(\hat p_z)$. El ICC se estima con el
+ANOVA de un factor sobre el indicador 0/1 entre quienes recibieron el material, $\hat\rho_I = (CMB-CMD)/(CMB+(\bar m-1)CMD)$, y
+$\mathrm{deff} = 1+(\bar m-1)\hat\rho_I$. El deff multiplica la varianza, así que el error estándar se multiplica por $\sqrt{\mathrm{deff}}$
+(interpreto así el enunciado). Ningún $\hat\rho_I$ resultó negativo; podría ocurrir porque el estimador ANOVA es una diferencia de cuadrados
+medios: si los centros son <em>más</em> homogéneos entre sí de lo que daría el azar (CMB &lt; CMD), la diferencia es negativa aunque el parámetro sea
+$\ge 0$, y se trunca en cero.</p>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>n recibió</th>
+<th>$\hat p$ nacional</th>
+<th>IC 95 % (MAS)</th>
+<th>$\bar m$</th>
+<th>$\hat\rho_I$</th>
+<th>deff</th>
+<th>IC 95 % con deff</th>
+<th>ancho MAS → deff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cuaderno de Espera</td>
+<td>2.213</td>
+<td>46,6 %</td>
+<td>[44,5; 48,7]</td>
+<td>18,4</td>
+<td>0,044</td>
+<td>1,77</td>
+<td>[43,8; 49,4]</td>
+<td>4,1 pp → 5,5 pp</td>
+</tr>
+<tr>
+<td>Caja de los Primeros Meses</td>
+<td>1.692</td>
+<td>55,1 %</td>
+<td>[52,7; 57,5]</td>
+<td>14,1</td>
+<td>0,037</td>
+<td>1,49</td>
+<td>[52,2; 58,0]</td>
+<td>4,7 pp → 5,8 pp</td>
+</tr>
+<tr>
+<td>Maletín Explorador</td>
+<td>1.162</td>
+<td>41,9 %</td>
+<td>[39,1; 44,7]</td>
+<td>9,7</td>
+<td>0,036</td>
+<td>1,31</td>
+<td>[38,7; 45,1]</td>
+<td>5,7 pp → 6,5 pp</td>
+</tr>
+<tr>
+<td>Cuentos para Conversar</td>
+<td>656</td>
+<td>49,0 %</td>
+<td>[45,2; 52,8]</td>
+<td>5,5</td>
+<td>0,053</td>
+<td>1,24</td>
+<td>[44,8; 53,2]</td>
+<td>7,5 pp → 8,4 pp</td>
+</tr>
+</tbody>
+</table>
+<p>Cerca de la mitad de las familias que reciben un material lo usa con frecuencia (42 % el Maletín,
+55 % la Caja). El ICC es pequeño (0,04-0,05) pero, con 10 a 18 cuidadores por centro, el deff llega a
+1,77 para el Cuaderno: los intervalos se ensanchan entre 11 % (Cuentos, pocos
+cuidadores por centro) y 33 % (Cuaderno). El muestreo por conglomerados cuesta el
+equivalente a perder entre un 20 % y un 45 % de la muestra.</p>
+<p><strong>4b. Dos contrastes puntuales (Wald, dos proporciones, sin corrección por conglomerados).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Contraste</th>
+<th>$\hat p_1$</th>
+<th>$\hat p_2$</th>
+<th>Diferencia</th>
+<th>IC 95 %</th>
+<th>z</th>
+<th>p bilateral</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cuaderno de Espera</td>
+<td>RM − Norte</td>
+<td>49,9 %</td>
+<td>45,4 %</td>
+<td>4,5 pp</td>
+<td>[-1,4; 10,4]</td>
+<td>1,51</td>
+<td>0,1322</td>
+</tr>
+<tr>
+<td>Cuentos para Conversar</td>
+<td>Centro − Sur</td>
+<td>55,4 %</td>
+<td>35,8 %</td>
+<td>19,6 pp</td>
+<td>[9,1; 30,2]</td>
+<td>3,64</td>
+<td>&lt; 0,001</td>
+</tr>
+</tbody>
+</table>
+<p><em>Cuaderno, RM vs. Norte:</em> la diferencia de 4,5 pp no es significativa (p = 0,13) y el intervalo incluye tanto
+el cero como el EMR de 10 pp: el estudio no puede afirmar ni descartar una brecha relevante; es un resultado <strong>no concluyente</strong>, no una
+igualdad. <em>Cuentos, Centro vs. Sur:</em> 19,6 pp con p &lt; 0,001; la estimación duplica el EMR, pero el intervalo
+[9,1; 30,2] es ancho (n = 210 por macrozona de diseño, 166 y 162 que recibieron) e incluye
+valores apenas sobre el EMR: es significativa y probablemente relevante, con magnitud mal determinada. Sin corregir por conglomerados ni
+por multiplicidad, ambos valores p son optimistas (ver 4a y 4c).</p>
+<p><strong>4c. Las 24 comparaciones como una familia.</strong> Valores p ordenados; Holm fue la corrección declarada, BH la alternativa.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Material</th>
+<th>Par</th>
+<th>Dif. (pp)</th>
+<th>IC 95 % (pp)</th>
+<th>p</th>
+<th>p Holm</th>
+<th>p BH</th>
+<th>Holm</th>
+<th>BH</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Cuentos</td>
+<td>Norte − Sur</td>
+<td>20,6</td>
+<td>[10,0; 31,1]</td>
+<td>0,0001</td>
+<td>0,0033</td>
+<td>0,0033</td>
+<td>sí</td>
+<td>sí</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Cuentos</td>
+<td>Centro − Sur</td>
+<td>19,6</td>
+<td>[9,1; 30,2]</td>
+<td>0,0003</td>
+<td>0,0063</td>
+<td>0,0033</td>
+<td>sí</td>
+<td>sí</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Cuaderno</td>
+<td>RM − Sur</td>
+<td>7,5</td>
+<td>[1,6; 13,4]</td>
+<td>0,0122</td>
+<td>0,2682</td>
+<td>0,0975</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Cuentos</td>
+<td>RM − Sur</td>
+<td>12,7</td>
+<td>[2,0; 23,3]</td>
+<td>0,0197</td>
+<td>0,4146</td>
+<td>0,1185</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Cuaderno</td>
+<td>Centro − Sur</td>
+<td>6,3</td>
+<td>[0,4; 12,2]</td>
+<td>0,0358</td>
+<td>0,7163</td>
+<td>0,1711</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Caja</td>
+<td>Norte − RM</td>
+<td>6,9</td>
+<td>[0,2; 13,6]</td>
+<td>0,0428</td>
+<td>0,8127</td>
+<td>0,1711</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Caja</td>
+<td>Norte − Sur</td>
+<td>5,6</td>
+<td>[-1,1; 12,2]</td>
+<td>0,1030</td>
+<td>1,0000</td>
+<td>0,3531</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Cuaderno</td>
+<td>Norte − RM</td>
+<td>-4,5</td>
+<td>[-10,4; 1,4]</td>
+<td>0,1322</td>
+<td>1,0000</td>
+<td>0,3967</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Cuentos</td>
+<td>Norte − RM</td>
+<td>7,9</td>
+<td>[-2,9; 18,7]</td>
+<td>0,1509</td>
+<td>1,0000</td>
+<td>0,4024</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Cuentos</td>
+<td>Centro − RM</td>
+<td>7,0</td>
+<td>[-3,8; 17,7]</td>
+<td>0,2057</td>
+<td>1,0000</td>
+<td>0,4936</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Caja</td>
+<td>Centro − RM</td>
+<td>4,0</td>
+<td>[-2,7; 10,7]</td>
+<td>0,2450</td>
+<td>1,0000</td>
+<td>0,5063</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Maletín</td>
+<td>Centro − Sur</td>
+<td>4,6</td>
+<td>[-3,5; 12,7]</td>
+<td>0,2672</td>
+<td>1,0000</td>
+<td>0,5063</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Cuaderno</td>
+<td>Norte − Centro</td>
+<td>-3,3</td>
+<td>[-9,1; 2,6]</td>
+<td>0,2742</td>
+<td>1,0000</td>
+<td>0,5063</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Cuaderno</td>
+<td>Norte − Sur</td>
+<td>3,0</td>
+<td>[-2,9; 8,9]</td>
+<td>0,3132</td>
+<td>1,0000</td>
+<td>0,5370</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Caja</td>
+<td>Norte − Centro</td>
+<td>2,9</td>
+<td>[-3,7; 9,6]</td>
+<td>0,3859</td>
+<td>1,0000</td>
+<td>0,6174</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Maletín</td>
+<td>Norte − Centro</td>
+<td>-3,3</td>
+<td>[-11,3; 4,7]</td>
+<td>0,4166</td>
+<td>1,0000</td>
+<td>0,6249</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Caja</td>
+<td>Centro − Sur</td>
+<td>2,6</td>
+<td>[-4,1; 9,3]</td>
+<td>0,4450</td>
+<td>1,0000</td>
+<td>0,6282</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Maletín</td>
+<td>Centro − RM</td>
+<td>2,8</td>
+<td>[-5,2; 10,9]</td>
+<td>0,4871</td>
+<td>1,0000</td>
+<td>0,6494</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Maletín</td>
+<td>RM − Sur</td>
+<td>1,8</td>
+<td>[-6,3; 9,8]</td>
+<td>0,6689</td>
+<td>1,0000</td>
+<td>0,7863</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Cuaderno</td>
+<td>Centro − RM</td>
+<td>-1,2</td>
+<td>[-7,1; 4,6]</td>
+<td>0,6775</td>
+<td>1,0000</td>
+<td>0,7863</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Caja</td>
+<td>RM − Sur</td>
+<td>-1,4</td>
+<td>[-8,1; 5,3]</td>
+<td>0,6880</td>
+<td>1,0000</td>
+<td>0,7863</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Maletín</td>
+<td>Norte − Sur</td>
+<td>1,3</td>
+<td>[-6,7; 9,3]</td>
+<td>0,7550</td>
+<td>1,0000</td>
+<td>0,8237</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Cuentos</td>
+<td>Norte − Centro</td>
+<td>0,9</td>
+<td>[-9,8; 11,6]</td>
+<td>0,8630</td>
+<td>1,0000</td>
+<td>0,9005</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Maletín</td>
+<td>Norte − RM</td>
+<td>-0,5</td>
+<td>[-8,4; 7,4]</td>
+<td>0,9063</td>
+<td>1,0000</td>
+<td>0,9063</td>
+<td>no</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>Sin corrección «sobreviven» 6 contrastes; con Holm, 2; con BH, 2: <strong>Cuentos para Conversar, Sur frente a Norte y frente
+a Centro</strong> (unos 20 pp menos de uso frecuente en el Sur). Holm compara el $i$-ésimo valor p ordenado con $\alpha/(m-i+1)$, que parte en
+0,00208 y crece lentamente; BH lo compara con $i\alpha/m$, que crece linealmente (0,00417 para $i$ = 2,
+0,00625 para $i$ = 3). BH es más permisivo porque tolera que una fracción de los rechazos sea falsa; aquí ambos coinciden
+porque hay un vacío entre los dos valores p muy pequeños (&lt; 0,001) y el tercero (0,012), que no pasa ni el umbral de BH para $i$ = 3.
+Las diferencias de 6-8 pp en Cuaderno y Caja que eran «significativas» sin corregir son el tipo de hallazgo que la familia de 24
+contrastes produce por azar: uno o dos falsos positivos esperados a $\alpha$ = 0,05.</p>
+<p><strong>4d. Independencia entre uso (tres niveles) y macrozona para el Maletín Explorador.</strong> Entre los 1.162 que lo recibieron:</p>
+<table>
+<thead>
+<tr>
+<th>Macrozona</th>
+<th>Nunca</th>
+<th>Ocasional</th>
+<th>Frecuente</th>
+<th>% Nunca</th>
+<th>% Ocasional</th>
+<th>% Frecuente</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Norte</td>
+<td>76</td>
+<td>99</td>
+<td>123</td>
+<td>25,5 %</td>
+<td>33,2 %</td>
+<td>41,3 %</td>
+</tr>
+<tr>
+<td>Centro</td>
+<td>69</td>
+<td>90</td>
+<td>128</td>
+<td>24,0 %</td>
+<td>31,4 %</td>
+<td>44,6 %</td>
+</tr>
+<tr>
+<td>RM</td>
+<td>85</td>
+<td>88</td>
+<td>124</td>
+<td>28,6 %</td>
+<td>29,6 %</td>
+<td>41,8 %</td>
+</tr>
+<tr>
+<td>Sur</td>
+<td>89</td>
+<td>79</td>
+<td>112</td>
+<td>31,8 %</td>
+<td>28,2 %</td>
+<td>40,0 %</td>
+</tr>
+</tbody>
+</table>
+<p>$\chi^2$ = 5,79, gl = 6, p = 0,45 (mínimo esperado 77, condiciones del test holgadas). No hay evidencia
+de que la distribución del uso dependa de la macrozona, lo que coincide con las seis comparaciones por pares del Maletín, ninguna
+significativa ni siquiera sin corregir (diferencias de 0,5 a 4,6 pp). El $\chi^2$ usa los tres niveles a la vez y un solo test, por lo que
+no necesita corrección por multiplicidad; los pares sólo miran «frecuente vs. resto».</p>
+<p><strong>4e. Diferencia de medianas del índice: uso frecuente vs. nunca del Cuaderno.</strong> Mediana 69,2 (n = 1.013)
+frente a 61,0 (n = 528): <strong>diferencia 8,2 puntos, IC bootstrap de percentiles 95 % [6,2; 9,9]</strong>
+(4.000 réplicas); test de permutación con 10.000 permutaciones: p = 0,0001 (ninguna permutación alcanzó la
+diferencia observada). La diferencia es estadísticamente clara y supera el EMR de 5 puntos. Aun así <strong>no es el efecto del material</strong>: los
+cuidadores no fueron asignados al uso, lo eligieron, y la <strong>escolaridad</strong> (parte 3e) determina a la vez quién usa el Cuaderno y cuánto sabe
+de crianza; la comparación mezcla el efecto del material con el de ser un cuidador más escolarizado (y, por la misma vía, más lector y de
+zona urbana). Dentro de estratos de escolaridad la diferencia baja a unos 5 puntos, y puede haber confusores no medidos (interés previo
+en la crianza, apoyo del centro de salud). Para estimar el efecto haría falta un diseño con asignación controlada: un ensayo
+aleatorizado del acompañamiento al uso (por centros de salud, con el mismo deff en mente) o, si no se puede negar el material, un
+escalonamiento aleatorio de la entrega (<em>stepped wedge</em>) o una regresión en discontinuidad sobre la fecha de inicio del programa, con medición
+previa del índice.</p>
+<p><strong>4f. Hipótesis preinscritas.</strong> H1 (uso igual entre macrozonas) se rechaza sólo para Cuentos (4c); H3 se rechaza (4e). Para H2 (pertinencia
+$\ge$ 80 %): Cuaderno 78,5 %, Caja 81,1 %, Maletín 77,8 %,
+Cuentos 82,3 %; los valores unilaterales p son 0,038, 0,88,
+0,030 y 0,93. Cuaderno y Maletín quedan 1,5 y 2,2 pp bajo la meta, significativo al 5 % pero
+muy lejos del EMR de 10 pp: estadísticamente «bajo 80 %», irrelevante para una decisión. La valoración mediana es 4 en los cuatro
+materiales (68-71 % los califica 4 o 5).</p>
+<h2>5. Potencia y tamaño de la muestra</h2>
+<p>Se usan los tamaños de <strong>diseño</strong>. Lo que se pierde por no recepción: con los n que efectivamente recibieron cada material, el margen
+nacional sube de 2,0 % a 2,1 % (Cuaderno, n = 2.213) y de 3,4 % a
+3,8 % (Cuentos, n = 656), antes del deff.</p>
+<p><strong>5a. Margen de error del 95 % con p = 0,5</strong> ($1{,}96\sqrt{0{,}25/n}$, por $\sqrt{\mathrm{deff}}$ en la segunda columna; deff = 1,77
+(el mayor, Cuaderno) para las cifras nacionales y por macrozona, 1,24 para Cuentos).</p>
+<table>
+<thead>
+<tr>
+<th>Estimación</th>
+<th>n</th>
+<th>Margen MAS</th>
+<th>Margen con deff</th>
+<th>Cumple 3,5 % (MAS / deff)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nacional, cualquier material (n = 2.400)</td>
+<td>2.400</td>
+<td>2,00 %</td>
+<td>2,66 %</td>
+<td>sí / sí</td>
+</tr>
+<tr>
+<td>Por macrozona (n = 600)</td>
+<td>600</td>
+<td>4,00 %</td>
+<td>5,32 %</td>
+<td>no / no</td>
+</tr>
+<tr>
+<td>Cuentos para Conversar, nacional (n = 840)</td>
+<td>840</td>
+<td>3,38 %</td>
+<td>3,76 %</td>
+<td>sí / no</td>
+</tr>
+<tr>
+<td>Cuentos para Conversar, por macrozona (n = 210)</td>
+<td>210</td>
+<td>6,76 %</td>
+<td>7,52 %</td>
+<td>no / no</td>
+</tr>
+</tbody>
+</table>
+<p>El estudio cumple el 3,5 % <strong>sólo para las cifras nacionales de los materiales que evalúa toda la muestra</strong> (2,0 % bajo MAS, 2,7 % con
+deff). Para Cuentos lo cumple apenas bajo MAS (3,4 %) y lo incumple con deff (3,8 %). Por macrozona no lo cumple en ningún caso (4,0 %
+y 5,3 %), y mucho menos para Cuentos por macrozona (6,8-7,5 %). Las bases pedían el 3,5 % «por material» a nivel nacional: se cumple
+para tres de cuatro materiales y se incumple en Cuentos si se reconoce el conglomerado.</p>
+<p><strong>5b. Diferencia mínima detectable</strong> (potencia 0,80, $\alpha$ = 0,05 bilateral, p = 0,5): $\delta = (z_{0{,}975}+z_{0{,}80})\sqrt{2\cdot 0{,}25\,\mathrm{deff}/n}$.</p>
+<table>
+<thead>
+<tr>
+<th>Contraste</th>
+<th>n por grupo</th>
+<th>DMD bajo MAS</th>
+<th>DMD con deff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dos macrozonas, material de toda la muestra (600 vs 600)</td>
+<td>600</td>
+<td>8,1 pp</td>
+<td>10,8 pp</td>
+</tr>
+<tr>
+<td>Dos macrozonas, Cuentos para Conversar (210 vs 210)</td>
+<td>210</td>
+<td>13,7 pp</td>
+<td>15,2 pp</td>
+</tr>
+</tbody>
+</table>
+<p>Frente al EMR de 10 pp declarado en 1a: para los materiales de toda la muestra el estudio podía detectar 10 pp bajo MAS (DMD 8,1 pp)
+pero queda justo por encima con el deff del Cuaderno (10,8 pp); para Cuentos <strong>no</strong> (13,7 y 15,2 pp). Esto explica 4b: la brecha de
+20 pp en Cuentos se detectó por ser el doble de la DMD, mientras que una brecha de 10 pp en Cuentos tendría apenas un 40-50 % de
+probabilidad de detectarse. El estudio no fue capaz, en general, de detectar las diferencias que declaré relevantes entre macrozonas.</p>
+<p><strong>5c. Seguimiento 2027.</strong> Objetivo: 5 pp entre cualquier par de macrozonas, potencia 0,80, $\alpha$ = 0,05/6 por contraste
+($z$ = 2,638), p = 0,5, deff 1,5, respuesta 80 %, elegibilidad por tramo y proporciones 20/20/25/35. La restricción la
+impone <strong>Cuentos</strong>, evaluado sólo por el tramo 36-59 meses. Por macrozona: $n_{\text{ef}} = (z_{\alpha/12}+z_{0{,}80})^2\cdot 0{,}5/0{,}05^2$ =
+<strong>2.422</strong> respondentes efectivos en ese tramo; × 1,5 = 3.633 respondentes; ÷ 0,8 = <strong>4.542 a contactar
+en el tramo 36-59 por macrozona</strong>. Como ese tramo es el 35 % del diseño, la macrozona completa son 12.976 contactos
+(gestantes 2.595, 0-11 meses 2.595, 12-35 meses 3.244,
+36-59 meses 4.542) y el <strong>total nacional 51.904 cuidadores a contactar</strong> (unas 21 veces el estudio de 2025).
+Verificación por simulación (20.000 réplicas de dos binomiales con $n_{\text{ef}}$ = 2.422, p = 0,50 vs. 0,55, test de Wald a $\alpha$/6):
+potencia <strong>80,6 %</strong>.</p>
+<p>Es impracticable para un servicio público. Lo que más lo encarece es la <strong>diferencia objetivo</strong>: 5 pp entra al cuadrado, y pasar a
+10 pp bajaría el total a 12.975; le sigue la <strong>regla de elegibilidad</strong> (sólo el 35 % de cada macrozona evalúa Cuentos, se
+contactan 2,9 cuidadores por cada uno útil: sin esa restricción serían 18.165); Bonferroni, el deff y la
+no respuesta pesan menos (sin cada uno: 33.639, 34.599 y
+41.519). Con <strong>4.000 contactados</strong> (1.000 por macrozona, 800 respuestas, $n_{\text{ef}}$ = 533 para
+los materiales de toda la muestra y 187 para Cuentos) la diferencia detectable con la misma potencia y Bonferroni es de
+<strong>11 pp entre macrozonas para Cuaderno, Caja y Maletín, y de 18 pp para Cuentos</strong>; para detectar
+5 pp la potencia sería 17 % y 5 %. Una alternativa
+sensata es sobremuestrear el tramo 36-59 (en vez de replicar el 35 %) y aceptar 10 pp como objetivo.</p>
+<p><strong>5d. Para una autoridad sin formación estadística.</strong> El <em>margen de error</em> dice cuánto puede alejarse una cifra de la encuesta del valor
+real por haber preguntado a una muestra y no a todos: «48 % ± 2 %» significa que el verdadero uso frecuente está, con alta confianza,
+entre 46 % y 50 %. Pero comparar dos regiones es otra pregunta: cada una trae su propio margen, y la diferencia entre ambas se mide con
+peor precisión que cada cifra por separado, y cada región usa sólo una cuarta parte de la muestra. La <em>potencia</em> es la
+probabilidad de que el estudio detecte una diferencia que sí existe; con 600 casos por región, una brecha de 4 puntos se detectaría
+menos de una de cada tres veces. Y cuando se comparan muchas regiones a la vez (seis pares por material, veinticuatro en total), alguna
+diferencia parecerá «significativa» por puro azar; por eso se exige un estándar más alto a cada comparación (<em>error global</em>) que el que
+bastaría para una sola (<em>error por estrato</em>). Un estudio con «error del 2 %» en la cifra nacional no puede, entonces, afirmar que dos
+regiones difieren en 4 puntos.</p>
+<h2>6. Marco legal de los datos</h2>
+<p><strong>6a. Datos personales y sensibles; seudonimización y minimización.</strong> Bajo la Ley 19.628 (art. 2, letra f) es dato personal toda
+información sobre una persona natural identificada o identificable; la Ley 21.719, vigente desde el 1 de diciembre de 2026, mantiene
+esa definición y amplía la de dato sensible (art. 2, letra g) a origen étnico o racial, situación socioeconómica, datos de salud y
+otros. En el archivo son <strong>datos personales</strong> <code>id_cuidador</code> (seudónimo, pero identificador), <code>id_centro</code>, <code>region</code>, <code>rural</code>,
+<code>sexo_cuidador</code>, <code>edad_cuidador</code>, <code>escolaridad</code>, <code>n_hijos</code> y las dos fechas, porque combinados permiten identificar a un cuidador en un
+centro de salud concreto (cuasi-identificadores). Son <strong>datos sensibles</strong> <code>pueblo_originario</code> (origen étnico), <code>peso_nacimiento</code>,
+<code>semanas_gestacion</code> y <code>edad_meses</code> (datos de salud del niño o niña y de la gestante), y <code>escolaridad</code> como indicador de situación
+socioeconómica (21.719). <code>migrante</code> no figura literalmente en el listado, pero por su riesgo de discriminación lo trataría como sensible.
+Que los datos describan a <strong>menores de edad</strong> añade el interés superior de la niñez (Ley 21.430, art. 7) y, en la 21.719, un estándar
+reforzado de licitud y de consentimiento del representante. Antes de entregar la base a terceros: reemplazar <code>id_cuidador</code> por un código
+aleatorio con tabla de correspondencia bajo custodia separada; recodificar o suprimir <code>id_centro</code>; reducir <code>region</code> a <code>macrozona</code>;
+llevar las fechas a mes; agrupar <code>edad_cuidador</code>, <code>edad_meses</code> y <code>peso_nacimiento</code> en tramos y <code>n_hijos</code> a «3 o más»; entregar
+<code>migrante</code> y <code>pueblo_originario</code> sólo bajo convenio con fines estadísticos; y entregar únicamente las columnas necesarias para el
+análisis solicitado (minimización), con registro de accesos y prohibición contractual de reidentificar.</p>
+<p><strong>6b. Solicitud de un medio por la Ley 20.285.</strong> El principio de transparencia obliga a entregar la información que obra en poder del
+servicio (arts. 5 y 10), y el informe, las bases de licitación, la metodología, el cuestionario y los tabulados agregados son
+públicos sin discusión. La base completa no: el art. 21 N.º 2 permite denegar cuando la publicidad afecta derechos de terceros, en
+particular la esfera de la vida privada y los datos sensibles, y el art. 21 N.º 5 remite a los secretos establecidos por leyes de quórum
+calificado, entre ellos el <strong>secreto estadístico</strong> que la Ley 17.374 (art. 29) impone a los datos individuales recogidos por el Sistema
+Estadístico Nacional, que no pueden divulgarse de forma que permita identificar a las personas. Lo que sí construiría es un <strong>archivo de
+uso público</strong>: sin <code>id_cuidador</code> ni <code>id_centro</code>, <code>region</code> sustituida por <code>macrozona</code>, fechas a trimestre, edades y peso en tramos,
+<code>n_hijos</code> con tope, supresión o agregación de las celdas que dejen menos de un umbral de casos (por ejemplo, $k \ge 5$ en el cruce
+macrozona × tramo × rural × escolaridad), eliminación de las columnas de migrante y pueblo originario o su entrega sólo agregada, y una
+pequeña perturbación de los valores continuos. Así se conservan las proporciones y los intervalos del informe y se impide reconstruir
+quién respondió. El medio recibiría ese archivo con la documentación de los cambios, más el derecho a pedir tabulados adicionales.</p>
+<p><strong>6c. Consentimiento informado.</strong> Sí lo requiere. Quien responde es el cuidador adulto y consiente por sí mismo sobre sus propios
+datos (19.628 art. 4; 21.719 exige consentimiento libre, informado, específico e inequívoco) y, como representante, sobre los datos del
+niño o niña. La Ley 21.430 obliga a decidir en función del interés superior del niño (art. 7), reconoce su autonomía progresiva y su
+derecho a ser oído y a la vida privada y la protección de sus datos: en la práctica, informar en lenguaje claro qué se pregunta, para
+qué, quién accederá y por cuánto tiempo, hacer explícito que negarse no afecta la entrega de los materiales ni la atención del centro, y
+permitir revocar. Los niños mayores (3-5 años) no participan directamente, pero su información se trata con el mismo estándar. En cuanto a
+la Ley 20.120, su objeto es la investigación científica en seres humanos en el ámbito biomédico, con intervención sobre las personas y
+revisión por comités ético-científicos acreditados; una evaluación de programa social basada en una encuesta a adultos, sin intervención
+ni procedimiento sobre las personas, queda a mi juicio fuera de su ámbito estricto. Aun así, la buena práctica (y la exigencia de la
+Dipres para estudios con población vulnerable) es someter el protocolo y el consentimiento a un comité de ética, sobre todo porque se
+recogen datos de salud de menores.</p></body></html>

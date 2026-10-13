@@ -1,0 +1,1471 @@
+{
+ "vacios": [
+  {
+   "material": "Cuaderno de Espera",
+   "elegibles": 2435,
+   "recibio: vacío estructural": 0,
+   "recibio: faltante": 0,
+   "uso/valoracion/pertinente: vacío estructural": 189,
+   "uso: faltante": 0,
+   "valoracion: faltante": 0,
+   "pertinente: faltante": 0
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "elegibles": 1946,
+   "recibio: vacío estructural": 489,
+   "recibio: faltante": 0,
+   "uso/valoracion/pertinente: vacío estructural": 720,
+   "uso: faltante": 0,
+   "valoracion: faltante": 0,
+   "pertinente: faltante": 0
+  },
+  {
+   "material": "Maletín Explorador",
+   "elegibles": 1459,
+   "recibio: vacío estructural": 976,
+   "recibio: faltante": 0,
+   "uso/valoracion/pertinente: vacío estructural": 1261,
+   "uso: faltante": 0,
+   "valoracion: faltante": 0,
+   "pertinente: faltante": 0
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "elegibles": 851,
+   "recibio: vacío estructural": 1584,
+   "recibio: faltante": 0,
+   "uso/valoracion/pertinente: vacío estructural": 1768,
+   "uso: faltante": 0,
+   "valoracion: faltante": 0,
+   "pertinente: faltante": 0
+  }
+ ],
+ "peso_mezcla": {
+  "pesos": [
+   0.059,
+   0.941
+  ],
+  "modas_g": [
+   3.17,
+   3263.96
+  ],
+  "sd_log": [
+   0.076,
+   0.065
+  ],
+  "cociente_modos": 1029.6,
+  "ic95_cociente": [
+   998.5,
+   1066.2
+  ],
+  "factor_compatible": "kg -> g",
+  "umbral_g": 132.2
+ },
+ "n_crudo": 2435,
+ "n_depurado": 2400,
+ "informe_depuracion": [
+  {
+   "regla": "duplicado exacto (toda la fila repetida)",
+   "acción": "excluir",
+   "registros": 35
+  },
+  {
+   "regla": "id_cuidador repetido tras quitar duplicados exactos",
+   "acción": "excluir",
+   "registros": 0
+  },
+  {
+   "regla": "region: variante de escritura (mayúsculas/tildes)",
+   "acción": "corregir",
+   "registros": 83
+  },
+  {
+   "regla": "region no pertenece a la macrozona declarada",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "indice_conocimientos: código centinela -99",
+   "acción": "faltante",
+   "registros": 48
+  },
+  {
+   "regla": "indice_conocimientos fuera de [0, 100]",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "valoracion_cuaderno fuera de la escala 1-5",
+   "acción": "faltante",
+   "registros": 21
+  },
+  {
+   "regla": "valoracion_caja fuera de la escala 1-5",
+   "acción": "faltante",
+   "registros": 16
+  },
+  {
+   "regla": "valoracion_maletin fuera de la escala 1-5",
+   "acción": "faltante",
+   "registros": 13
+  },
+  {
+   "regla": "valoracion_cuentos fuera de la escala 1-5",
+   "acción": "faltante",
+   "registros": 8
+  },
+  {
+   "regla": "peso_nacimiento en kilogramos (valor < 132 g, componente 1 de la mezcla)",
+   "acción": "corregir",
+   "registros": 112
+  },
+  {
+   "regla": "fecha_entrega posterior a fecha_encuesta",
+   "acción": "faltante",
+   "registros": 23
+  },
+  {
+   "regla": "fecha no interpretable",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "edad_meses fuera del tramo declarado",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "semanas_gestacion fuera de [4, 42]",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "lectura_semana fuera de [0, 7]",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "edad_cuidador fuera de [12, 90]",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "uso/valoracion/pertinente_cuaderno informados sin recibir el material",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "uso/valoracion/pertinente_caja informados sin recibir el material",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "uso/valoracion/pertinente_maletin informados sin recibir el material",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "uso/valoracion/pertinente_cuentos informados sin recibir el material",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "recibio_cuaderno informado en tramo no elegible",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "recibio_caja informado en tramo no elegible",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "recibio_maletin informado en tramo no elegible",
+   "acción": "faltante",
+   "registros": 0
+  },
+  {
+   "regla": "recibio_cuentos informado en tramo no elegible",
+   "acción": "faltante",
+   "registros": 0
+  }
+ ],
+ "esc_na": 136,
+ "esc_na_tablas": {
+  "rural": {
+   "pct": {
+    "con escolaridad": {
+     "Rural": 21.1,
+     "Urbano": 78.9
+    },
+    "sin escolaridad": {
+     "Rural": 44.9,
+     "Urbano": 55.1
+    }
+   },
+   "chi2": 40.17,
+   "gl": 1,
+   "p": 0.0
+  },
+  "macrozona": {
+   "pct": {
+    "con escolaridad": {
+     "Centro": 25.4,
+     "Norte": 25.1,
+     "RM": 25.7,
+     "Sur": 23.8
+    },
+    "sin escolaridad": {
+     "Centro": 19.1,
+     "Norte": 22.8,
+     "RM": 13.2,
+     "Sur": 44.9
+    }
+   },
+   "chi2": 32.99,
+   "gl": 3,
+   "p": 0.0
+  }
+ },
+ "esc_na_tasa": {
+  "rural": {
+   "Rural": 11.3,
+   "Urbano": 4.0
+  },
+  "macrozona": {
+   "Centro": 4.3,
+   "Norte": 5.2,
+   "RM": 3.0,
+   "Sur": 10.2
+  },
+  "tramo": {
+   "Gestante": 5.6,
+   "0-11 meses": 6.7,
+   "12-35 meses": 5.3,
+   "36-59 meses": 5.4
+  }
+ },
+ "estructura": [
+  {
+   "tramo": "Gestante",
+   "Norte": 120,
+   "Centro": 120,
+   "RM": 120,
+   "Sur": 120,
+   "Total": 480
+  },
+  {
+   "tramo": "0-11 meses",
+   "Norte": 120,
+   "Centro": 120,
+   "RM": 120,
+   "Sur": 120,
+   "Total": 480
+  },
+  {
+   "tramo": "12-35 meses",
+   "Norte": 150,
+   "Centro": 150,
+   "RM": 150,
+   "Sur": 150,
+   "Total": 600
+  },
+  {
+   "tramo": "36-59 meses",
+   "Norte": 210,
+   "Centro": 210,
+   "RM": 210,
+   "Sur": 210,
+   "Total": 840
+  }
+ ],
+ "evaluan": {
+  "Cuaderno de Espera": 2400,
+  "Caja de los Primeros Meses": 1920,
+  "Maletín Explorador": 1440,
+  "Cuentos para Conversar": 840
+ },
+ "uso_zona": [
+  {
+   "material": "cuaderno",
+   "macrozona": "Norte",
+   "n_elegibles": 600,
+   "cobertura": 0.925,
+   "n_recibio": 555,
+   "k_frec": 252,
+   "p_frec": 0.4541,
+   "se": 0.0211,
+   "ic_lo": 0.4126,
+   "ic_hi": 0.4955
+  },
+  {
+   "material": "cuaderno",
+   "macrozona": "Centro",
+   "n_elegibles": 600,
+   "cobertura": 0.9383,
+   "n_recibio": 563,
+   "k_frec": 274,
+   "p_frec": 0.4867,
+   "se": 0.0211,
+   "ic_lo": 0.4454,
+   "ic_hi": 0.528
+  },
+  {
+   "material": "cuaderno",
+   "macrozona": "RM",
+   "n_elegibles": 600,
+   "cobertura": 0.9283,
+   "n_recibio": 557,
+   "k_frec": 278,
+   "p_frec": 0.4991,
+   "se": 0.0212,
+   "ic_lo": 0.4576,
+   "ic_hi": 0.5406
+  },
+  {
+   "material": "cuaderno",
+   "macrozona": "Sur",
+   "n_elegibles": 600,
+   "cobertura": 0.8967,
+   "n_recibio": 538,
+   "k_frec": 228,
+   "p_frec": 0.4238,
+   "se": 0.0213,
+   "ic_lo": 0.382,
+   "ic_hi": 0.4655
+  },
+  {
+   "material": "caja",
+   "macrozona": "Norte",
+   "n_elegibles": 480,
+   "cobertura": 0.8729,
+   "n_recibio": 419,
+   "k_frec": 247,
+   "p_frec": 0.5895,
+   "se": 0.024,
+   "ic_lo": 0.5424,
+   "ic_hi": 0.6366
+  },
+  {
+   "material": "caja",
+   "macrozona": "Centro",
+   "n_elegibles": 480,
+   "cobertura": 0.8854,
+   "n_recibio": 425,
+   "k_frec": 238,
+   "p_frec": 0.56,
+   "se": 0.0241,
+   "ic_lo": 0.5128,
+   "ic_hi": 0.6072
+  },
+  {
+   "material": "caja",
+   "macrozona": "RM",
+   "n_elegibles": 480,
+   "cobertura": 0.8771,
+   "n_recibio": 421,
+   "k_frec": 219,
+   "p_frec": 0.5202,
+   "se": 0.0243,
+   "ic_lo": 0.4725,
+   "ic_hi": 0.5679
+  },
+  {
+   "material": "caja",
+   "macrozona": "Sur",
+   "n_elegibles": 480,
+   "cobertura": 0.8896,
+   "n_recibio": 427,
+   "k_frec": 228,
+   "p_frec": 0.534,
+   "se": 0.0241,
+   "ic_lo": 0.4866,
+   "ic_hi": 0.5813
+  },
+  {
+   "material": "maletin",
+   "macrozona": "Norte",
+   "n_elegibles": 360,
+   "cobertura": 0.8278,
+   "n_recibio": 298,
+   "k_frec": 123,
+   "p_frec": 0.4128,
+   "se": 0.0285,
+   "ic_lo": 0.3569,
+   "ic_hi": 0.4687
+  },
+  {
+   "material": "maletin",
+   "macrozona": "Centro",
+   "n_elegibles": 360,
+   "cobertura": 0.7972,
+   "n_recibio": 287,
+   "k_frec": 128,
+   "p_frec": 0.446,
+   "se": 0.0293,
+   "ic_lo": 0.3885,
+   "ic_hi": 0.5035
+  },
+  {
+   "material": "maletin",
+   "macrozona": "RM",
+   "n_elegibles": 360,
+   "cobertura": 0.825,
+   "n_recibio": 297,
+   "k_frec": 124,
+   "p_frec": 0.4175,
+   "se": 0.0286,
+   "ic_lo": 0.3614,
+   "ic_hi": 0.4736
+  },
+  {
+   "material": "maletin",
+   "macrozona": "Sur",
+   "n_elegibles": 360,
+   "cobertura": 0.7778,
+   "n_recibio": 280,
+   "k_frec": 112,
+   "p_frec": 0.4,
+   "se": 0.0293,
+   "ic_lo": 0.3426,
+   "ic_hi": 0.4574
+  },
+  {
+   "material": "cuentos",
+   "macrozona": "Norte",
+   "n_elegibles": 210,
+   "cobertura": 0.7857,
+   "n_recibio": 165,
+   "k_frec": 93,
+   "p_frec": 0.5636,
+   "se": 0.0386,
+   "ic_lo": 0.488,
+   "ic_hi": 0.6393
+  },
+  {
+   "material": "cuentos",
+   "macrozona": "Centro",
+   "n_elegibles": 210,
+   "cobertura": 0.7905,
+   "n_recibio": 166,
+   "k_frec": 92,
+   "p_frec": 0.5542,
+   "se": 0.0386,
+   "ic_lo": 0.4786,
+   "ic_hi": 0.6298
+  },
+  {
+   "material": "cuentos",
+   "macrozona": "RM",
+   "n_elegibles": 210,
+   "cobertura": 0.7762,
+   "n_recibio": 163,
+   "k_frec": 79,
+   "p_frec": 0.4847,
+   "se": 0.0391,
+   "ic_lo": 0.4079,
+   "ic_hi": 0.5614
+  },
+  {
+   "material": "cuentos",
+   "macrozona": "Sur",
+   "n_elegibles": 210,
+   "cobertura": 0.7714,
+   "n_recibio": 162,
+   "k_frec": 58,
+   "p_frec": 0.358,
+   "se": 0.0377,
+   "ic_lo": 0.2842,
+   "ic_hi": 0.4319
+  }
+ ],
+ "indice_por_escolaridad": [
+  {
+   "escolaridad": "Básica",
+   "n": 335.0,
+   "Q1": 46.8,
+   "mediana": 56.3,
+   "Q3": 65.2,
+   "media": 56.1,
+   "mín": 16.0,
+   "máx": 94.0
+  },
+  {
+   "escolaridad": "Media",
+   "n": 952.0,
+   "Q1": 53.8,
+   "mediana": 62.9,
+   "Q3": 72.3,
+   "media": 62.9,
+   "mín": 20.7,
+   "máx": 100.0
+  },
+  {
+   "escolaridad": "Técnica",
+   "n": 539.0,
+   "Q1": 60.6,
+   "mediana": 69.2,
+   "Q3": 79.0,
+   "media": 69.6,
+   "mín": 27.7,
+   "máx": 100.0
+  },
+  {
+   "escolaridad": "Universitaria",
+   "n": 392.0,
+   "Q1": 64.8,
+   "mediana": 74.6,
+   "Q3": 83.7,
+   "media": 74.6,
+   "mín": 37.5,
+   "máx": 100.0
+  }
+ ],
+ "indice_por_tramo": [
+  {
+   "tramo": "Gestante",
+   "n": 471.0,
+   "Q1": 50.0,
+   "mediana": 59.1,
+   "Q3": 68.6,
+   "media": 58.8,
+   "mín": 16.0,
+   "máx": 100.0
+  },
+  {
+   "tramo": "0-11 meses",
+   "n": 471.0,
+   "Q1": 54.4,
+   "mediana": 63.0,
+   "Q3": 73.5,
+   "media": 63.8,
+   "mín": 22.9,
+   "máx": 100.0
+  },
+  {
+   "tramo": "12-35 meses",
+   "n": 585.0,
+   "Q1": 56.5,
+   "mediana": 66.4,
+   "Q3": 74.4,
+   "media": 65.8,
+   "mín": 24.7,
+   "máx": 100.0
+  },
+  {
+   "tramo": "36-59 meses",
+   "n": 825.0,
+   "Q1": 59.7,
+   "mediana": 70.0,
+   "Q3": 80.2,
+   "media": 69.9,
+   "mín": 29.7,
+   "máx": 100.0
+  }
+ ],
+ "indice_global": {
+  "n": 2352.0,
+  "Q1": 55.5,
+  "mediana": 65.6,
+  "Q3": 75.3,
+  "media": 65.5,
+  "mín": 16.0,
+  "máx": 100.0
+ },
+ "indice_asimetria": -0.02,
+ "lectura_indice": {
+  "n": 1881,
+  "spearman": 0.274,
+  "p": 7.41e-34,
+  "mediana_por_dia": {
+   "0.0": 59.4,
+   "1.0": 61.1,
+   "2.0": 63.7,
+   "3.0": 66.5,
+   "4.0": 68.1,
+   "5.0": 68.8,
+   "6.0": 73.0,
+   "7.0": 73.7
+  }
+ },
+ "simpson": [
+  {
+   "estrato": "Toda la muestra",
+   "n frecuente": 1013.0,
+   "media frecuente": 69.3,
+   "n no frecuente": 1158.0,
+   "media no frecuente": 62.8,
+   "diferencia": 6.6,
+   "% uso frecuente": 46.7
+  },
+  {
+   "estrato": "Básica",
+   "n frecuente": 96.0,
+   "media frecuente": 59.7,
+   "n no frecuente": 208.0,
+   "media no frecuente": 54.5,
+   "diferencia": 5.2,
+   "% uso frecuente": 31.6
+  },
+  {
+   "estrato": "Media",
+   "n frecuente": 398.0,
+   "media frecuente": 65.7,
+   "n no frecuente": 485.0,
+   "media no frecuente": 61.2,
+   "diferencia": 4.5,
+   "% uso frecuente": 45.1
+  },
+  {
+   "estrato": "Técnica",
+   "n frecuente": 249.0,
+   "media frecuente": 72.8,
+   "n no frecuente": 248.0,
+   "media no frecuente": 67.0,
+   "diferencia": 5.8,
+   "% uso frecuente": 50.1
+  },
+  {
+   "estrato": "Universitaria",
+   "n frecuente": 210.0,
+   "media frecuente": 77.0,
+   "n no frecuente": 156.0,
+   "media no frecuente": 72.4,
+   "diferencia": 4.6,
+   "% uso frecuente": 57.4
+  }
+ ],
+ "corr_metodos": {
+  "Spearman": 65,
+  "Pearson": 55,
+  "sin_par": 0
+ },
+ "corr_top": [
+  {
+   "par": "escolaridad_ord ~ indice_conocimientos",
+   "r": 0.4,
+   "método": "Spearman"
+  },
+  {
+   "par": "frec_cuaderno ~ valoracion_cuaderno",
+   "r": 0.37,
+   "método": "Spearman"
+  },
+  {
+   "par": "frec_maletin ~ valoracion_maletin",
+   "r": 0.37,
+   "método": "Spearman"
+  },
+  {
+   "par": "frec_caja ~ valoracion_caja",
+   "r": 0.34,
+   "método": "Spearman"
+  },
+  {
+   "par": "frec_cuentos ~ valoracion_cuentos",
+   "r": 0.32,
+   "método": "Spearman"
+  },
+  {
+   "par": "frec_cuentos ~ lectura_semana",
+   "r": 0.31,
+   "método": "Pearson"
+  },
+  {
+   "par": "frec_caja ~ lectura_semana",
+   "r": 0.31,
+   "método": "Pearson"
+  },
+  {
+   "par": "frec_cuaderno ~ lectura_semana",
+   "r": 0.3,
+   "método": "Pearson"
+  },
+  {
+   "par": "frec_maletin ~ lectura_semana",
+   "r": 0.29,
+   "método": "Pearson"
+  },
+  {
+   "par": "lectura_semana ~ indice_conocimientos",
+   "r": 0.28,
+   "método": "Pearson"
+  }
+ ],
+ "nacional": [
+  {
+   "material": "Cuaderno de Espera",
+   "n_recibio": 2213,
+   "p_nacional": 0.4659,
+   "ee_mas": 0.0106,
+   "ic_mas": [
+    0.4452,
+    0.4867
+   ],
+   "centros": 120,
+   "m_barra": 18.4417,
+   "rho_I": 0.0441,
+   "rho_truncado": 0.0441,
+   "deff": 1.7689,
+   "ee_deff": 0.0141,
+   "ic_deff": [
+    0.4383,
+    0.4935
+   ],
+   "ancho_mas_pp": 4.1498,
+   "ancho_deff_pp": 5.5193
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "n_recibio": 1692,
+   "p_nacional": 0.5509,
+   "ee_mas": 0.0121,
+   "ic_mas": [
+    0.5272,
+    0.5746
+   ],
+   "centros": 120,
+   "m_barra": 14.1,
+   "rho_I": 0.0375,
+   "rho_truncado": 0.0375,
+   "deff": 1.4916,
+   "ee_deff": 0.0147,
+   "ic_deff": [
+    0.522,
+    0.5798
+   ],
+   "ancho_mas_pp": 4.7335,
+   "ancho_deff_pp": 5.781
+  },
+  {
+   "material": "Maletín Explorador",
+   "n_recibio": 1162,
+   "p_nacional": 0.4191,
+   "ee_mas": 0.0145,
+   "ic_mas": [
+    0.3907,
+    0.4474
+   ],
+   "centros": 120,
+   "m_barra": 9.6833,
+   "rho_I": 0.0357,
+   "rho_truncado": 0.0357,
+   "deff": 1.3096,
+   "ee_deff": 0.0166,
+   "ic_deff": [
+    0.3866,
+    0.4515
+   ],
+   "ancho_mas_pp": 5.6724,
+   "ancho_deff_pp": 6.4913
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "n_recibio": 656,
+   "p_nacional": 0.4901,
+   "ee_mas": 0.0193,
+   "ic_mas": [
+    0.4524,
+    0.5279
+   ],
+   "centros": 119,
+   "m_barra": 5.5126,
+   "rho_I": 0.0527,
+   "rho_truncado": 0.0527,
+   "deff": 1.2379,
+   "ee_deff": 0.0214,
+   "ic_deff": [
+    0.4482,
+    0.5321
+   ],
+   "ancho_mas_pp": 7.5466,
+   "ancho_deff_pp": 8.3964
+  }
+ ],
+ "deff": {
+  "cuaderno": 1.769,
+  "caja": 1.492,
+  "maletin": 1.31,
+  "cuentos": 1.238
+ },
+ "deff_max": 1.769,
+ "cobertura": [
+  {
+   "material": "cuaderno",
+   "Norte": 92.5,
+   "Centro": 93.8,
+   "RM": 92.8,
+   "Sur": 89.7,
+   "nacional": 92.2
+  },
+  {
+   "material": "caja",
+   "Norte": 87.3,
+   "Centro": 88.5,
+   "RM": 87.7,
+   "Sur": 89.0,
+   "nacional": 88.1
+  },
+  {
+   "material": "maletin",
+   "Norte": 82.8,
+   "Centro": 79.7,
+   "RM": 82.5,
+   "Sur": 77.8,
+   "nacional": 80.7
+  },
+  {
+   "material": "cuentos",
+   "Norte": 78.6,
+   "Centro": 79.0,
+   "RM": 77.6,
+   "Sur": 77.1,
+   "nacional": 78.1
+  }
+ ],
+ "contrastes_b": [
+  {
+   "material": "Cuaderno de Espera",
+   "contraste": "RM − Norte",
+   "p1": 0.4991,
+   "p2": 0.4541,
+   "diferencia_pp": 4.5048,
+   "ic95_pp": [
+    -1.36,
+    10.37
+   ],
+   "z": 1.5054,
+   "p": 0.1322,
+   "supera_EMR": false,
+   "IC_excluye_EMR": false
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "contraste": "Centro − Sur",
+   "p1": 0.5542,
+   "p2": 0.358,
+   "diferencia_pp": 19.6192,
+   "ic95_pp": [
+    9.05,
+    30.19
+   ],
+   "z": 3.6387,
+   "p": 0.0003,
+   "supera_EMR": true,
+   "IC_excluye_EMR": false
+  }
+ ],
+ "familia": [
+  {
+   "material": "Cuentos para Conversar",
+   "par": "Norte − Sur",
+   "dif_pp": 20.5612,
+   "ic_lo_pp": 9.9892,
+   "ic_hi_pp": 31.1332,
+   "p": 0.0001,
+   "rango": 1,
+   "p_holm": 0.0033,
+   "p_BH": 0.0033,
+   "p_bonferroni": 0.0033,
+   "sin_corregir": true,
+   "Holm": true,
+   "BH": true
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "par": "Centro − Sur",
+   "dif_pp": 19.6192,
+   "ic_lo_pp": 9.0514,
+   "ic_hi_pp": 30.1871,
+   "p": 0.0003,
+   "rango": 2,
+   "p_holm": 0.0063,
+   "p_BH": 0.0033,
+   "p_bonferroni": 0.0066,
+   "sin_corregir": true,
+   "Holm": true,
+   "BH": true
+  },
+  {
+   "material": "Cuaderno de Espera",
+   "par": "RM − Sur",
+   "dif_pp": 7.5311,
+   "ic_lo_pp": 1.6422,
+   "ic_hi_pp": 13.4199,
+   "p": 0.0122,
+   "rango": 3,
+   "p_holm": 0.2682,
+   "p_BH": 0.0975,
+   "p_bonferroni": 0.2926,
+   "sin_corregir": true,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "par": "RM − Sur",
+   "dif_pp": 12.6638,
+   "ic_lo_pp": 2.0163,
+   "ic_hi_pp": 23.3113,
+   "p": 0.0197,
+   "rango": 4,
+   "p_holm": 0.4146,
+   "p_BH": 0.1185,
+   "p_bonferroni": 0.4739,
+   "sin_corregir": true,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuaderno de Espera",
+   "par": "Centro − Sur",
+   "dif_pp": 6.2887,
+   "ic_lo_pp": 0.4164,
+   "ic_hi_pp": 12.1609,
+   "p": 0.0358,
+   "rango": 5,
+   "p_holm": 0.7163,
+   "p_BH": 0.1711,
+   "p_bonferroni": 0.8596,
+   "sin_corregir": true,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "par": "Norte − RM",
+   "dif_pp": 6.9309,
+   "ic_lo_pp": 0.2255,
+   "ic_hi_pp": 13.6362,
+   "p": 0.0428,
+   "rango": 6,
+   "p_holm": 0.8127,
+   "p_BH": 0.1711,
+   "p_bonferroni": 1.0,
+   "sin_corregir": true,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "par": "Norte − Sur",
+   "dif_pp": 5.5541,
+   "ic_lo_pp": -1.1223,
+   "ic_hi_pp": 12.2305,
+   "p": 0.103,
+   "rango": 7,
+   "p_holm": 1.0,
+   "p_BH": 0.3531,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuaderno de Espera",
+   "par": "Norte − RM",
+   "dif_pp": -4.5048,
+   "ic_lo_pp": -10.37,
+   "ic_hi_pp": 1.3604,
+   "p": 0.1322,
+   "rango": 8,
+   "p_holm": 1.0,
+   "p_BH": 0.3967,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "par": "Norte − RM",
+   "dif_pp": 7.8974,
+   "ic_lo_pp": -2.8789,
+   "ic_hi_pp": 18.6737,
+   "p": 0.1509,
+   "rango": 9,
+   "p_holm": 1.0,
+   "p_BH": 0.4024,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "par": "Centro − RM",
+   "dif_pp": 6.9554,
+   "ic_lo_pp": -3.8168,
+   "ic_hi_pp": 17.7276,
+   "p": 0.2057,
+   "rango": 10,
+   "p_holm": 1.0,
+   "p_BH": 0.4936,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "par": "Centro − RM",
+   "dif_pp": 3.981,
+   "ic_lo_pp": -2.7307,
+   "ic_hi_pp": 10.6927,
+   "p": 0.245,
+   "rango": 11,
+   "p_holm": 1.0,
+   "p_BH": 0.5063,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Maletín Explorador",
+   "par": "Centro − Sur",
+   "dif_pp": 4.5993,
+   "ic_lo_pp": -3.5248,
+   "ic_hi_pp": 12.7234,
+   "p": 0.2672,
+   "rango": 12,
+   "p_holm": 1.0,
+   "p_BH": 0.5063,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuaderno de Espera",
+   "par": "Norte − Centro",
+   "dif_pp": -3.2624,
+   "ic_lo_pp": -9.1109,
+   "ic_hi_pp": 2.586,
+   "p": 0.2742,
+   "rango": 13,
+   "p_holm": 1.0,
+   "p_BH": 0.5063,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuaderno de Espera",
+   "par": "Norte − Sur",
+   "dif_pp": 3.0262,
+   "ic_lo_pp": -2.8555,
+   "ic_hi_pp": 8.908,
+   "p": 0.3132,
+   "rango": 14,
+   "p_holm": 1.0,
+   "p_BH": 0.537,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "par": "Norte − Centro",
+   "dif_pp": 2.9499,
+   "ic_lo_pp": -3.7179,
+   "ic_hi_pp": 9.6176,
+   "p": 0.3859,
+   "rango": 15,
+   "p_holm": 1.0,
+   "p_BH": 0.6174,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Maletín Explorador",
+   "par": "Norte − Centro",
+   "dif_pp": -3.3241,
+   "ic_lo_pp": -11.3441,
+   "ic_hi_pp": 4.6958,
+   "p": 0.4166,
+   "rango": 16,
+   "p_holm": 1.0,
+   "p_BH": 0.6249,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "par": "Centro − Sur",
+   "dif_pp": 2.6042,
+   "ic_lo_pp": -4.0786,
+   "ic_hi_pp": 9.2871,
+   "p": 0.445,
+   "rango": 17,
+   "p_holm": 1.0,
+   "p_BH": 0.6282,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Maletín Explorador",
+   "par": "Centro − RM",
+   "dif_pp": 2.8485,
+   "ic_lo_pp": -5.1846,
+   "ic_hi_pp": 10.8815,
+   "p": 0.4871,
+   "rango": 18,
+   "p_holm": 1.0,
+   "p_BH": 0.6494,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Maletín Explorador",
+   "par": "RM − Sur",
+   "dif_pp": 1.7508,
+   "ic_lo_pp": -6.2732,
+   "ic_hi_pp": 9.7748,
+   "p": 0.6689,
+   "rango": 19,
+   "p_holm": 1.0,
+   "p_BH": 0.7863,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuaderno de Espera",
+   "par": "Centro − RM",
+   "dif_pp": -1.2424,
+   "ic_lo_pp": -7.098,
+   "ic_hi_pp": 4.6133,
+   "p": 0.6775,
+   "rango": 20,
+   "p_holm": 1.0,
+   "p_BH": 0.7863,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "par": "RM − Sur",
+   "dif_pp": -1.3768,
+   "ic_lo_pp": -8.0971,
+   "ic_hi_pp": 5.3436,
+   "p": 0.688,
+   "rango": 21,
+   "p_holm": 1.0,
+   "p_BH": 0.7863,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Maletín Explorador",
+   "par": "Norte − Sur",
+   "dif_pp": 1.2752,
+   "ic_lo_pp": -6.7358,
+   "ic_hi_pp": 9.2861,
+   "p": 0.755,
+   "rango": 22,
+   "p_holm": 1.0,
+   "p_BH": 0.8237,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "par": "Norte − Centro",
+   "dif_pp": 0.9419,
+   "ic_lo_pp": -9.7556,
+   "ic_hi_pp": 11.6395,
+   "p": 0.863,
+   "rango": 23,
+   "p_holm": 1.0,
+   "p_BH": 0.9005,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  },
+  {
+   "material": "Maletín Explorador",
+   "par": "Norte − RM",
+   "dif_pp": -0.4757,
+   "ic_lo_pp": -8.3942,
+   "ic_hi_pp": 7.4429,
+   "p": 0.9063,
+   "rango": 24,
+   "p_holm": 1.0,
+   "p_BH": 0.9063,
+   "p_bonferroni": 1.0,
+   "sin_corregir": false,
+   "Holm": false,
+   "BH": false
+  }
+ ],
+ "familia_resumen": {
+  "sin_corregir": 6,
+  "holm": 2,
+  "bh": 2,
+  "bonferroni": 2,
+  "umbral_holm_primero": 0.00208,
+  "umbral_bh_ultimo_rechazado": 0.00417
+ },
+ "chi2_maletin": {
+  "chi2": 5.79,
+  "gl": 6,
+  "p": 0.4467,
+  "tabla": [
+   {
+    "macrozona": "Norte",
+    "Nunca": 76,
+    "Ocasional": 99,
+    "Frecuente": 123
+   },
+   {
+    "macrozona": "Centro",
+    "Nunca": 69,
+    "Ocasional": 90,
+    "Frecuente": 128
+   },
+   {
+    "macrozona": "RM",
+    "Nunca": 85,
+    "Ocasional": 88,
+    "Frecuente": 124
+   },
+   {
+    "macrozona": "Sur",
+    "Nunca": 89,
+    "Ocasional": 79,
+    "Frecuente": 112
+   }
+  ],
+  "pct_fila": [
+   {
+    "macrozona": "Norte",
+    "Nunca": 25.5,
+    "Ocasional": 33.2,
+    "Frecuente": 41.3
+   },
+   {
+    "macrozona": "Centro",
+    "Nunca": 24.0,
+    "Ocasional": 31.4,
+    "Frecuente": 44.6
+   },
+   {
+    "macrozona": "RM",
+    "Nunca": 28.6,
+    "Ocasional": 29.6,
+    "Frecuente": 41.8
+   },
+   {
+    "macrozona": "Sur",
+    "Nunca": 31.8,
+    "Ocasional": 28.2,
+    "Frecuente": 40.0
+   }
+  ],
+  "min_esperado": 76.9
+ },
+ "medianas": {
+  "n_frecuente": 1013,
+  "n_nunca": 528,
+  "mediana_frecuente": 69.2,
+  "mediana_nunca": 61.0,
+  "dif": 8.2,
+  "ic_boot": [
+   6.25,
+   9.9
+  ],
+  "B_boot": 4000,
+  "B_perm": 10000,
+  "p_perm": 0.0001,
+  "dif_media": 8.12
+ },
+ "pertinencia": [
+  {
+   "material": "Cuaderno de Espera",
+   "n": 2213,
+   "pertinente_%": 78.4907,
+   "ic95_%": [
+    76.8,
+    80.2
+   ],
+   "z": -1.775,
+   "p_unilateral": 0.0379,
+   "valoracion_mediana": 4.0,
+   "valoracion_media": 3.9256,
+   "valoracion_%4o5": 68.685
+  },
+  {
+   "material": "Caja de los Primeros Meses",
+   "n": 1692,
+   "pertinente_%": 81.1466,
+   "ic95_%": [
+    79.3,
+    83.0
+   ],
+   "z": 1.1791,
+   "p_unilateral": 0.8808,
+   "valoracion_mediana": 4.0,
+   "valoracion_media": 3.9714,
+   "valoracion_%4o5": 70.2128
+  },
+  {
+   "material": "Maletín Explorador",
+   "n": 1162,
+   "pertinente_%": 77.7969,
+   "ic95_%": [
+    75.4,
+    80.2
+   ],
+   "z": -1.8775,
+   "p_unilateral": 0.0302,
+   "valoracion_mediana": 4.0,
+   "valoracion_media": 3.9217,
+   "valoracion_%4o5": 67.7281
+  },
+  {
+   "material": "Cuentos para Conversar",
+   "n": 656,
+   "pertinente_%": 82.3171,
+   "ic95_%": [
+    79.4,
+    85.2
+   ],
+   "z": 1.4837,
+   "p_unilateral": 0.931,
+   "valoracion_mediana": 4.0,
+   "valoracion_media": 3.9784,
+   "valoracion_%4o5": 70.8841
+  }
+ ],
+ "margenes": [
+  {
+   "estimación": "Nacional, cualquier material (n = 2.400)",
+   "n": 2400,
+   "deff usado": 1.77,
+   "margen MAS (pp)": 2.0,
+   "margen con deff (pp)": 2.66,
+   "cumple 3,5 % (MAS)": true,
+   "cumple 3,5 % (deff)": true
+  },
+  {
+   "estimación": "Por macrozona (n = 600)",
+   "n": 600,
+   "deff usado": 1.77,
+   "margen MAS (pp)": 4.0,
+   "margen con deff (pp)": 5.32,
+   "cumple 3,5 % (MAS)": false,
+   "cumple 3,5 % (deff)": false
+  },
+  {
+   "estimación": "Cuentos para Conversar, nacional (n = 840)",
+   "n": 840,
+   "deff usado": 1.24,
+   "margen MAS (pp)": 3.38,
+   "margen con deff (pp)": 3.76,
+   "cumple 3,5 % (MAS)": true,
+   "cumple 3,5 % (deff)": false
+  },
+  {
+   "estimación": "Cuentos para Conversar, por macrozona (n = 210)",
+   "n": 210,
+   "deff usado": 1.24,
+   "margen MAS (pp)": 6.76,
+   "margen con deff (pp)": 7.52,
+   "cumple 3,5 % (MAS)": false,
+   "cumple 3,5 % (deff)": false
+  }
+ ],
+ "recibidos": {
+  "cuaderno": 2213,
+  "caja": 1692,
+  "maletin": 1162,
+  "cuentos": 656
+ },
+ "margen_recibidos": {
+  "Cuaderno de Espera": {
+   "n_recibio": 2213,
+   "margen MAS": 2.08,
+   "margen deff": 2.77
+  },
+  "Caja de los Primeros Meses": {
+   "n_recibio": 1692,
+   "margen MAS": 2.38,
+   "margen deff": 2.91
+  },
+  "Maletín Explorador": {
+   "n_recibio": 1162,
+   "margen MAS": 2.87,
+   "margen deff": 3.29
+  },
+  "Cuentos para Conversar": {
+   "n_recibio": 656,
+   "margen MAS": 3.83,
+   "margen deff": 4.26
+  }
+ },
+ "dmd": [
+  {
+   "contraste": "Dos macrozonas, material de toda la muestra (600 vs 600)",
+   "n por grupo": 600,
+   "DMD MAS (pp)": 8.09,
+   "DMD con deff (pp)": 10.76
+  },
+  {
+   "contraste": "Dos macrozonas, Cuentos para Conversar (210 vs 210)",
+   "n por grupo": 210,
+   "DMD MAS (pp)": 13.67,
+   "DMD con deff (pp)": 15.21
+  }
+ ],
+ "plan27": {
+  "z_alfa_bonf": 2.638,
+  "n_efectivo": 2422,
+  "n_respondentes_36_59": 3633,
+  "n_contactar_36_59": 4542,
+  "por_tramo_por_zona": {
+   "Gestante": 2595,
+   "0-11 meses": 2595,
+   "12-35 meses": 3244,
+   "36-59 meses": 4542
+  },
+  "total_por_zona": 12976,
+  "total_nacional": 51904,
+  "potencia_simulada": 0.8061,
+  "con_4000": {
+   "n_eff_cuentos": 186.7,
+   "dmd_cuentos_pp": 18.0,
+   "n_eff_todos": 533.3,
+   "dmd_todos_pp": 10.7,
+   "potencia_sim_cuentos_delta_obj": 0.0453,
+   "potencia_sim_todos_delta_obj": 0.16585
+  },
+  "sensibilidad_total": {
+   "base": 51899,
+   "sin Bonferroni (alfa 0,05)": 33639,
+   "deff 1": 34599,
+   "respuesta 100 %": 41519,
+   "delta 10 pp": 12975,
+   "sin restricción de tramo (prop 1)": 18165
+  }
+ }
+}
